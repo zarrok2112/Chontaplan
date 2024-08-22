@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import './login.css';
+import services from '../../services/services';
 
 const Login = () => {
 	const [isValidatePassword, setValidatePassword] = useState('');
@@ -9,6 +10,55 @@ const Login = () => {
 	const [errorValidateEmail, setErrorValidateEmail] = useState(true);
 
 	var contador = 0 ;
+
+	const registrarUsuario = (e) => { debugger
+		e.preventDefault();
+		const nombre = e.target.name.value;
+		const correo = e.target.email.value;
+		const contra = e.target.pass.value;
+		const verifiContra = e.target.passTwo.value;
+
+		let data = {
+			"user_info":{
+				"name": nombre,
+				"email": correo,
+				"password": contra,
+				"role":0
+			}
+		}
+		
+		services.signUp(data).then(response => {
+			if(response.status === 200) {
+				console.log(response);
+			} else {
+				console.log(response.data[0].errorMessage);
+			}
+		})
+		
+		e.target.name.value = '';
+		e.target.email.value = '';
+		e.target.pass.value = '';
+		e.target.passTwo.value = '';
+
+	}
+
+	const login = (e) => {
+		e.preventDefault();
+
+		const user = e.target.email.value;
+		const pass = e.target.pswd.value;
+
+		services.login(user,pass).then(response => {
+			if(response.status === 200) {
+				console.log(response);
+			} else {
+				console.log(response.data[0].errorMessage);
+			}
+		});
+
+		e.target.email.value = '';
+		e.target.pass.value = '';
+	}
     
 
 	const validatePass = (pass, confir) => {
@@ -102,17 +152,19 @@ const Login = () => {
 				<input type="checkbox" id="chk" aria-hidden="true" />
 
 					<div class="signup">
-						<form>
+						<form onSubmit={registrarUsuario}>
 							<label for="chk" aria-hidden="true">Registro</label>
 							<input 
 								type="text" 
-								name="txt" 
+							
+								name="name"
 								placeholder="Full name" 
 								required="" 
 							/>
 							<input 
 								type="email" 
 								name="email" 
+								id="email"
 								placeholder="Email" 
 								required=""
 								value={validateEmail}
@@ -124,7 +176,8 @@ const Login = () => {
 							{errorValidateEmail === false ? <p style={{color:'white'}}>{"El correo no es edu"}</p>:''}
 							<input 
 								type="password" 
-								name="pswd" 
+								name="pass" 
+								id="pass"
 								placeholder="Password" 
 								required=""
 								value = {isValidatePassword}
@@ -145,7 +198,8 @@ const Login = () => {
 
 							<input 
 								type="password" 
-								name="cpswd" 
+								name="passTwo" 
+								id="passTwo"
 								placeholder="Repeat password" 
 								required=""
 								value={isConfirmPassword}
@@ -162,11 +216,11 @@ const Login = () => {
 					<div class="login">
 
 							<label for="chk" aria-hidden="true">Inicio</label>
-						<form>
+						<form onSubmit={login}>
 
 					
-							<input type="email" name="email" placeholder="Email" required="" />
-							<input type="password" name="pswd" placeholder="Password" required="" />
+							<input type="email" name="email" placeholder="Email" required="" id='email' />
+							<input type="password" name="pswd" placeholder="Password" required="" id='pswd' />
 							<button type="submit" id="disparo">Iniciar</button>
 						</form>
 					</div>
