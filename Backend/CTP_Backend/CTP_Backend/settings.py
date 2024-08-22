@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'api',
 ]
 
+AUTH_USER_MODEL = "api.User"
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -77,7 +79,7 @@ WSGI_APPLICATION = 'CTP_Backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        "ENGINE": os.environ.get("SQL_ENGINE", default="django.db.backends.sqlite3"),
+        "ENGINE": 'django.db.backends.postgresql',
         "NAME":  os.environ.get("PG_CTP_BACKEND_DBNAME", default=os.path.join(BASE_DIR, "db.sqlite3")),
         "USER":  os.environ.get("PG_CTP_BACKEND_USER", default="user"),
         "PASSWORD":  os.environ.get("PG_CTP_BACKEND_PASSWORD", default="password"),
