@@ -7,20 +7,34 @@ const Login = () => {
 	const [messageError, setMessageError] = useState('');
 	const [validateEmail, setValidateEmail] = useState('');
 	const [errorValidateEmail, setErrorValidateEmail] = useState(true);
-
+	var contador = 0 ;
+    
 	const validatePass = (pass, confir) => {
 		const  tieneOchoCaracteres = pass.length >= 8; // Filtrar solo los números
 		const tieneMayuscula = /[A-Z]/.test(pass); // Verificar mayúsculas
 		const tieneMinuscula = /[a-z]/.test(pass); // Verificar minúsculas
 		const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(pass); // Verificar caracteres especiales
-		if(tieneOchoCaracteres && !tieneMayuscula && tieneMinuscula && !tieneEspecial) {
-			progressPassword(1);
-		} else if(tieneOchoCaracteres && tieneMayuscula && !tieneMinuscula && !tieneEspecial) {
-			progressPassword(2);
-		} else if (tieneOchoCaracteres && tieneMayuscula && tieneMinuscula && !tieneEspecial) {
-			progressPassword(3);
-		} else if(tieneOchoCaracteres && tieneMayuscula && tieneMinuscula && tieneEspecial) {
-			progressPassword(4);
+		if(tieneMinuscula || tieneMayuscula) {
+			contador = 1 ; 
+			
+		}
+		if (tieneMayuscula && tieneMinuscula ) {
+			contador = 2 ; 
+		} 
+		if(tieneOchoCaracteres && tieneMayuscula && tieneMinuscula) {
+			contador = 3 ; 
+		} 
+		if(tieneOchoCaracteres && tieneMayuscula && tieneMinuscula && tieneEspecial) {
+			contador = 4 ; 
+			
+		} 
+		
+
+		if (contador !== 0) {
+			
+			progressPassword(contador);
+
+			
 		}
 		
 		if(pass === confir) {
@@ -41,8 +55,12 @@ const Login = () => {
 		for(var i=0; i < bar.length; i++) {
 			if (strength === 0) {
 				barColorClass = 'strength-bar';
+			}
+			else if (strength === 1) {
+			
+				barColorClass = 'strength-bar low';
 			} else if (strength === 2) {
-				barColorClass = 'strength-bar medium';
+				barColorClass = 'strength-bar active';
 			} else if (strength === 3) {
 				barColorClass = 'strength-bar medium';
 			} else if (strength === 4) {
@@ -136,8 +154,8 @@ const Login = () => {
 					</div>
 			
 					<div class="login">
-						<form>
 							<label for="chk" aria-hidden="true">Inicio</label>
+						<form>
 							<input type="email" name="email" placeholder="Email" required="" />
 							<input type="password" name="pswd" placeholder="Password" required="" />
 							<button type="submit" id="disparo">Iniciar</button>
