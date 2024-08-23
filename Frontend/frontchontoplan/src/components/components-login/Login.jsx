@@ -29,9 +29,9 @@ const Login = () => {
 		
 		services.signUp(data).then(response => {
 			if(response.status === 200) {
-				console.log(response);
+				console.log(response.data.message);
 			} else {
-				console.log(response.data[0].errorMessage);
+				console.log(response.data.message);
 			}
 		})
 		
@@ -47,17 +47,20 @@ const Login = () => {
 
 		const user = e.target.email.value;
 		const pass = e.target.pswd.value;
+		const formData = new URLSearchParams();
+    formData.append('email', user);
+    formData.append('password',pass);
 
-		services.login(user,pass).then(response => {
+		services.login(formData).then(response => {
 			if(response.status === 200) {
-				console.log(response);
+				console.log(response.data.message);
 			} else {
-				console.log(response.data[0].errorMessage);
+				console.log(response.data.message);
 			}
 		});
 
 		e.target.email.value = '';
-		e.target.pass.value = '';
+		e.target.pswd.value = '';
 	}
     
 
