@@ -1,8 +1,11 @@
 import React, {useState} from 'react';
 import './login.css';
 import services from '../../services/services';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+	const navigate = useNavigate();
+
 	const [isValidatePassword, setValidatePassword] = useState('');
 	const [isConfirmPassword, setIsConfirmPassword] = useState('');
 	const [messageError, setMessageError] = useState('');
@@ -30,6 +33,7 @@ const Login = () => {
 		services.signUp(data).then(response => {
 			if(response.status === 200) {
 				console.log(response);
+				navigate('/home');
 			} else {
 				console.log(response.data[0].errorMessage);
 			}
@@ -140,7 +144,7 @@ const Login = () => {
 	};
 
     return (
-        <div>
+        <div className="component-login">
             <div class="mirave">
 				Cali es Cali
 				<br />
