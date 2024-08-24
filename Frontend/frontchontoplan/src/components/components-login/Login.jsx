@@ -1,8 +1,11 @@
 import React, {useState} from 'react';
 import './login.css';
 import services from '../../services/services';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+	const navigate = useNavigate();
+
 	const [isValidatePassword, setValidatePassword] = useState('');
 	const [isConfirmPassword, setIsConfirmPassword] = useState('');
 	const [messageError, setMessageError] = useState('');
@@ -63,6 +66,55 @@ const Login = () => {
 		e.target.pswd.value = '';
 	}
     
+	const registrarUsuario = (e) => {
+		e.preventDefault();
+		const nombre = e.target.name.value;
+		const correo = e.target.email.value;
+		const contra = e.target.pass.value;
+		const verifiContra = e.target.passTwo.value;
+
+		let data = {
+			"user_info":{
+				"name": nombre,
+				"email": correo,
+				"password": contra,
+				"role":0
+			}
+		}
+		
+		services.signUp(data).then(response => {
+			if(response.status === 200) {
+				console.log(response);
+				navigate('/home');
+			} else {
+				console.log(response.data[0].errorMessage);
+			}
+		})
+		
+		e.target.name.value = '';
+		e.target.email.value = '';
+		e.target.pass.value = '';
+		e.target.passTwo.value = '';
+
+	}
+
+	const login = (e) => {
+		e.preventDefault();
+
+		const user = e.target.email.value;
+		const pass = e.target.pass.value;
+
+		services.login(user,pass).then(response => {
+			if(response.status === 200) {
+				console.log(response);
+			} else {
+				console.log(response.data[0].errorMessage);
+			}
+		});
+
+		e.target.email.value = '';
+		e.target.pass.value = '';
+	}
 
 	const validatePass = (pass, confir) => {
 		const  tieneOchoCaracteres = pass.length >= 8; // Filtrar solo los números
@@ -144,7 +196,7 @@ const Login = () => {
 	};
 
     return (
-        <div>
+        <div className="component-login">
             <div class="mirave">
 				Cali es Cali
 				<br />
@@ -159,7 +211,8 @@ const Login = () => {
 							<label for="chk" aria-hidden="true">Registro</label>
 							<input 
 								type="text" 
-							
+								name="txt" 
+								id="name"
 								name="name"
 								placeholder="Full name" 
 								required="" 
@@ -179,7 +232,7 @@ const Login = () => {
 							{errorValidateEmail === false ? <p style={{color:'white'}}>{"El correo no es edu"}</p>:''}
 							<input 
 								type="password" 
-								name="pass" 
+								name="pass"
 								id="pass"
 								placeholder="Password" 
 								required=""
@@ -200,7 +253,7 @@ const Login = () => {
 							</div>
 
 							<input 
-								type="password" 
+								type="password"
 								name="passTwo" 
 								id="passTwo"
 								placeholder="Repeat password" 
@@ -220,10 +273,9 @@ const Login = () => {
 
 							<label for="chk" aria-hidden="true">Inicio</label>
 						<form onSubmit={login}>
+							<input type="email" name="email" id="email" placeholder="Email" required="" />
+							<input type="password" name="pswd" id="pass" placeholder="Password" required="" />
 
-					
-							<input type="email" name="email" placeholder="Email" required="" id='email' />
-							<input type="password" name="pswd" placeholder="Password" required="" id='pswd' />
 							<button type="submit" id="disparo">Iniciar</button>
 						</form>
 					</div>
