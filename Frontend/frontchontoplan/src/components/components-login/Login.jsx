@@ -14,45 +14,14 @@ const Login = () => {
 
 	var contador = 0 ;
 
-	const registrarUsuario = (e) => { debugger
-		e.preventDefault();
-		const nombre = e.target.name.value;
-		const correo = e.target.email.value;
-		const contra = e.target.pass.value;
-		const verifiContra = e.target.passTwo.value;
-
-		let data = {
-			"user_info":{
-				"name": nombre,
-				"email": correo,
-				"password": contra,
-				"role":0
-			}
-		}
-		
-		services.signUp(data).then(response => {
-			if(response.status === 200) {
-				console.log(response.data.message);
-			} else {
-				console.log(response.data.message);
-			}
-		})
-		
-		e.target.name.value = '';
-		e.target.email.value = '';
-		e.target.pass.value = '';
-		e.target.passTwo.value = '';
-
-	}
-
 	const login = (e) => {
 		e.preventDefault();
 
 		const user = e.target.email.value;
 		const pass = e.target.pswd.value;
 		const formData = new URLSearchParams();
-    formData.append('email', user);
-    formData.append('password',pass);
+		formData.append('email', user);
+		formData.append('password',pass);
 
 		services.login(formData).then(response => {
 			if(response.status === 200) {
@@ -96,24 +65,6 @@ const Login = () => {
 		e.target.pass.value = '';
 		e.target.passTwo.value = '';
 
-	}
-
-	const login = (e) => {
-		e.preventDefault();
-
-		const user = e.target.email.value;
-		const pass = e.target.pass.value;
-
-		services.login(user,pass).then(response => {
-			if(response.status === 200) {
-				console.log(response);
-			} else {
-				console.log(response.data[0].errorMessage);
-			}
-		});
-
-		e.target.email.value = '';
-		e.target.pass.value = '';
 	}
 
 	const validatePass = (pass, confir) => {
@@ -213,7 +164,6 @@ const Login = () => {
 								type="text" 
 								name="txt" 
 								id="name"
-								name="name"
 								placeholder="Full name" 
 								required="" 
 							/>
