@@ -4,101 +4,113 @@ import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const navigate = useNavigate();
 
-    const [isValidatePassword, setValidatePassword] = useState('');
-    const [isConfirmPassword, setIsConfirmPassword] = useState('');
-    const [messageError, setMessageError] = useState('');
-    const [validateEmail, setValidateEmail] = useState('');
-    const [errorValidateEmail, setErrorValidateEmail] = useState(true);
+	const navigate = useNavigate();
 
-    var contador = 0;
+	const [isValidatePassword, setValidatePassword] = useState('');
+	const [isConfirmPassword, setIsConfirmPassword] = useState('');
+	const [messageError, setMessageError] = useState('');
+	const [validateEmail, setValidateEmail] = useState('');
+	const [errorValidateEmail, setErrorValidateEmail] = useState(true);
 
-    const registrarUsuario = (e) => {
-        e.preventDefault();
-        const nombre = e.target.name.value;
-        const correo = e.target.email.value;
-        const contra = e.target.pass.value;
-        const verifiContra = e.target.passTwo.value;
+	var contador = 0 ;
 
-        let data = {
-            "user_info": {
-                "name": nombre,
-                "email": correo,
-                "password": contra,
-                "role": 0
-            }
-        }
+	const login = (e) => {
+		e.preventDefault();
 
-        services.signUp(data).then(response => {
-            if (response.status === 200) {
-                console.log(response);
-                navigate('/home');
-            } else {
-                console.log(response.data[0].errorMessage);
-            }
-        });
+		const user = e.target.email.value;
+		const pass = e.target.pswd.value;
+		const formData = new URLSearchParams();
+		formData.append('email', user);
+		formData.append('password',pass);
 
-        e.target.name.value = '';
-        e.target.email.value = '';
-        e.target.pass.value = '';
-        e.target.passTwo.value = '';
-    }
+		services.login(formData).then(response => {
+			if(response.status === 200) {
+				console.log(response.data.message);
+			} else {
+				console.log(response.data.message);
+			}
+		});
 
-    const login = (e) => {
-        e.preventDefault();
+		e.target.email.value = '';
+		e.target.pswd.value = '';
+	}
+    
+	const registrarUsuario = (e) => {
+		e.preventDefault();
+		const nombre = e.target.name.value;
+		const correo = e.target.email.value;
+		const contra = e.target.pass.value;
+		const verifiContra = e.target.passTwo.value;
 
-        const user = e.target.email.value;
-        const pass = e.target.pass.value;
+		let data = {
+			"user_info":{
+				"name": nombre,
+				"email": correo,
+				"password": contra,
+				"role":0
+			}
+		}
+		
+		services.signUp(data).then(response => {
+			if(response.status === 200) {
+				console.log(response);
+				navigate('/home');
+			} else {
+				console.log(response.data[0].errorMessage);
+			}
+		})
+		
+		e.target.name.value = '';
+		e.target.email.value = '';
+		e.target.pass.value = '';
+		e.target.passTwo.value = '';
 
-        services.login(user, pass).then(response => {
-            if (response.status === 200) {
-                console.log(response);
-            } else {
-                console.log(response.data[0].errorMessage);
-            }
-        });
+	}
 
-        e.target.email.value = '';
-        e.target.pass.value = '';
-    }
+	const validatePass = (pass, confir) => {
+		const  tieneOchoCaracteres = pass.length >= 8; // Filtrar solo los números
+		const tieneMayuscula = /[A-Z]/.test(pass); // Verificar mayúsculas
+		const tieneMinuscula = /[a-z]/.test(pass); // Verificar minúsculas
+		const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(pass); // Verificar caracteres especiales
 
-    const validatePass = (pass, confir) => {
-        const tieneOchoCaracteres = pass.length >= 8;
-        const tieneMayuscula = /[A-Z]/.test(pass);
-        const tieneMinuscula = /[a-z]/.test(pass);
-        const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+		if(tieneMinuscula || tieneMayuscula) {
+			contador = 1 ; 
+			
+		}
+		if (tieneMayuscula && tieneMinuscula ) {
+			contador = 2 ; 
+		} 
+		if(tieneOchoCaracteres && tieneMayuscula && tieneMinuscula) {
+			contador = 3 ; 
+		} 
+		if(tieneOchoCaracteres && tieneMayuscula && tieneMinuscula && tieneEspecial) {
+			contador = 4 ; 
+			
+		} 
+		
 
-        if (tieneMinuscula || tieneMayuscula) {
-            contador = 1;
-        }
-        if (tieneMayuscula && tieneMinuscula) {
-            contador = 2;
-        }
-        if (tieneOchoCaracteres && tieneMayuscula && tieneMinuscula) {
-            contador = 3;
-        }
-        if (tieneOchoCaracteres && tieneMayuscula && tieneMinuscula && tieneEspecial) {
-            contador = 4;
-        }
+		if (contador !== 0) {
+			
+			progressPassword(contador);
 
-        if (contador !== 0) {
-            progressPassword(contador);
-        }
+			
 
-        if (pass === confir) {
-            setMessageError("");
-        } else {
-            setMessageError("La contraseña no coincide.");
-        }
+		}
+		
+		if(pass === confir) {
+			setMessageError("");
+		} else {
+			setMessageError("La contraseña no coincide.");
+		}
+		
+		if(pass === '') {
+			progressPassword(0);
+		}
+	};
 
-        if (pass === '') {
-            progressPassword(0);
-        }
-    };
-
-    const progressPassword = (strength) => {
-        const bar = document.getElementsByClassName('strength-bar');
+	const progressPassword = (strength) => {
+		const bar = document.getElementsByClassName('strength-bar');
         let barColorClass = 'strength-bar';
 
         for (var i = 0; i < bar.length; i++) {
@@ -134,87 +146,90 @@ const Login = () => {
     return (
         <div className="component-login">
             <div class="mirave">
-                Cali es Cali
-                <br />
-                <span>lo demás es loma </span>
-            </div>
+				Cali es Cali
+				<br />
+				<spam>lo demás es loma </spam>
+			</div>
 
-            <div class="main">
-                <input type="checkbox" id="chk" aria-hidden="true" />
+			<div class="main">  	
+				<input type="checkbox" id="chk" aria-hidden="true" />
 
-                <div class="signup">
-                    <form onSubmit={registrarUsuario}>
-                        <label for="chk" aria-hidden="true">Registro</label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            placeholder="Full name"
-                            required=""
-                        />
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            placeholder="Email"
-                            required=""
-                            value={validateEmail}
-                            onChange={(e) => {
-                                setValidateEmail(e.target.value);
-                                validateCorreoEdu(e.target.value);
-                            }}
-                        />
-                        {errorValidateEmail === false ? <p style={{ color: 'white' }}>{"El correo no es edu"}</p> : ''}
-                        <input
-                            type="password"
-                            name="pass"
-                            id="pass"
-                            placeholder="Password"
-                            required=""
-                            value={isValidatePassword}
-                            onChange={(e) => {
-                                setValidatePassword(e.target.value)
-                                validatePass(e.target.value, isConfirmPassword);
-                            }}
-                        />
-                        <div class="password-strength">
-                            <span>Seguridad de la contraseña</span>
-                            <div class="strength-meter">
-                                <div class="strength-bar"></div>
-                                <div class="strength-bar"></div>
-                                <div class="strength-bar"></div>
-                                <div class="strength-bar"></div>
-                            </div>
-                        </div>
+					<div class="signup">
+						<form onSubmit={registrarUsuario}>
+							<label for="chk" aria-hidden="true">Registro</label>
+							<input 
+								type="text" 
+								name="txt" 
+								id="name"
+								placeholder="Full name" 
+								required="" 
+							/>
+							<input 
+								type="email" 
+								name="email" 
+								id="email"
+								placeholder="Email" 
+								required=""
+								value={validateEmail}
+								onChange={(e) => {
+									setValidateEmail(e.target.value);
+									validateCorreoEdu(e.target.value);
+								}}
+							/>
+							{errorValidateEmail === false ? <p style={{color:'white'}}>{"El correo no es edu"}</p>:''}
+							<input 
+								type="password" 
+								name="pass"
+								id="pass"
+								placeholder="Password" 
+								required=""
+								value = {isValidatePassword}
+								onChange={(e)=>{
+									setValidatePassword(e.target.value)
+									validatePass(e.target.value,isConfirmPassword);
+								}} 
+							/>
+							<div class="password-strength">
+								<span>Seguridad de la contraseña</span>
+								<div class="strength-meter">
+									<div class="strength-bar"></div>
+									<div class="strength-bar"></div>
+									<div class="strength-bar"></div>
+									<div class="strength-bar"></div>
+								</div>
+							</div>
 
-                        <input
-                            type="password"
-                            name="passTwo"
-                            id="passTwo"
-                            placeholder="Repeat password"
-                            required=""
-                            value={isConfirmPassword}
-                            onChange={(e) => {
-                                setIsConfirmPassword(e.target.value);
-                                validatePass(isValidatePassword, e.target.value);
-                            }}
-                        />
-                        {messageError && <p style={{ color: 'white' }}>{messageError}</p>}
-                        <button type="submit" id="joinus">Registrar</button>
-                    </form>
-                </div>
+							<input 
+								type="password"
+								name="passTwo" 
+								id="passTwo"
+								placeholder="Repeat password" 
+								required=""
+								value={isConfirmPassword}
+								onChange={(e)=>{
+									setIsConfirmPassword(e.target.value);
+									validatePass(isValidatePassword,e.target.value);
+								}}
+							/>
+							{messageError && <p style={{color:'white'}}>{messageError}</p>}
+							<button type="submit" id="joinus">Registrar</button>
+						</form>
+					</div>
+			
+					<div class="login">
 
-                <div class="login">
-                    <label for="chk" aria-hidden="true">Inicio</label>
-                    <form onSubmit={login}>
-                        <input type="email" name="email" id="email" placeholder="Email" required="" />
-                        <input type="password" name="pswd" id="pass" placeholder="Password" required="" />
+							<label for="chk" aria-hidden="true">Inicio</label>
+						<form onSubmit={login}>
+							<input type="email" name="email" id="email" placeholder="Email" required="" />
+							<input type="password" name="pswd" id="pass" placeholder="Password" required="" />
 
-                        <button type="submit" id="disparo">Iniciar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+							<button type="submit" id="disparo">Iniciar</button>
+						</form>
+					</div>
+			
+			</div>
+    	</div>
+
     );
 };
 
