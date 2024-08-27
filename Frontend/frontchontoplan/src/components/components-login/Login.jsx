@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import './login.css';
 import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+
 	const navigate = useNavigate();
 
 	const [isValidatePassword, setValidatePassword] = useState('');
@@ -112,39 +113,35 @@ const Login = () => {
 		const bar = document.getElementsByClassName('strength-bar');
         let barColorClass = 'strength-bar';
 
-		for(var i=0; i < bar.length; i++) {
-			if (strength === 0) {
-				barColorClass = 'strength-bar';
+        for (var i = 0; i < bar.length; i++) {
+            if (strength === 0) {
+                barColorClass = 'strength-bar';
+            }
+            else if (strength === 1) {
+                barColorClass = 'strength-bar low';
+            } else if (strength === 2) {
+                barColorClass = 'strength-bar active';
+            } else if (strength === 3) {
+                barColorClass = 'strength-bar medium';
+            } else if (strength === 4) {
+                barColorClass = 'strength-bar strong';
+            }
+            bar[i].className = barColorClass;
 
-			}
-			else if (strength === 1) {
-			
-				barColorClass = 'strength-bar low';
-			} else if (strength === 2) {
-				barColorClass = 'strength-bar active';
-			
-			} else if (strength === 3) {
-				barColorClass = 'strength-bar medium';
-			} else if (strength === 4) {
-				barColorClass = 'strength-bar strong';
-			}
-			bar[i].className = barColorClass;
+            if (i === strength && strength !== 0) {
+                break;
+            }
+        }
+    };
 
-			if(i === strength && strength !== 0) {
-				break;
-			}
-		}
-	};
-
-	const validateCorreoEdu = (email) => {
-		if(email === '') {
-			setErrorValidateEmail(true);
-		} else {
-			const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]*edu[a-zA-Z0-9.-]*$/;
-			setErrorValidateEmail(regex.test(email));
-		}
-		
-	};
+    const validateCorreoEdu = (email) => {
+        if (email === '') {
+            setErrorValidateEmail(true);
+        } else {
+            const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]*edu[a-zA-Z0-9.-]*$/;
+            setErrorValidateEmail(regex.test(email));
+        }
+    };
 
     return (
         <div className="component-login">
@@ -232,6 +229,7 @@ const Login = () => {
 			
 			</div>
     	</div>
+
     );
 };
 
