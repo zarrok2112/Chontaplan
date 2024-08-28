@@ -11,11 +11,16 @@ class Services {
     }
   
     async login(formdata){
-        return await axios.post('http://localhost:8000/api/v1/user/login/',formdata,{
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-             },
-        });
+        try {
+            return await axios.post('http://localhost:8000/api/v1/user/login/',formdata,{
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                 },
+            });
+        }
+        catch(e) {
+            console.log('error '+e);
+        }
     }
 }
 

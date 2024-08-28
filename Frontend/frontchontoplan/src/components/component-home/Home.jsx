@@ -10,7 +10,7 @@ import Progress from "../component-progress/Progress";
 const Home = () => {
     const [selectedIndex, setSelectedIndex] = useState(1);
     const [title, setTitle] = useState("Registrar mi evento");
-    const [progress, setProgress] = useState(true);
+    const [progress, setProgress] = useState(false);
 
     const handleListItemClick = (e, num) => {
         setSelectedIndex(num);
