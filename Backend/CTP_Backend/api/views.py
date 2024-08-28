@@ -14,11 +14,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
+
 from .models import User
 from .serializers import (
     UserSerializer,
     SignupSerializer
     )
+
 
 from CTP_Backend.settings import EMAIL_HOST_USER
 

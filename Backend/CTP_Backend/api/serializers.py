@@ -4,7 +4,9 @@ import os
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
+
 from .models import User
+
 
 
 class UserSerializer(serializers.ModelSerializer):

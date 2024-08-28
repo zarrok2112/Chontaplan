@@ -1,9 +1,10 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import './login.css';
 import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+
 	const navigate = useNavigate();
 
 	const [isValidatePassword, setValidatePassword] = useState('');
@@ -14,45 +15,14 @@ const Login = () => {
 
 	var contador = 0 ;
 
-	const registrarUsuario = (e) => { debugger
-		e.preventDefault();
-		const nombre = e.target.name.value;
-		const correo = e.target.email.value;
-		const contra = e.target.pass.value;
-		const verifiContra = e.target.passTwo.value;
-
-		let data = {
-			"user_info":{
-				"name": nombre,
-				"email": correo,
-				"password": contra,
-				"role":0
-			}
-		}
-		
-		services.signUp(data).then(response => {
-			if(response.status === 200) {
-				console.log(response.data.message);
-			} else {
-				console.log(response.data.message);
-			}
-		})
-		
-		e.target.name.value = '';
-		e.target.email.value = '';
-		e.target.pass.value = '';
-		e.target.passTwo.value = '';
-
-	}
-
 	const login = (e) => {
 		e.preventDefault();
 
 		const user = e.target.email.value;
 		const pass = e.target.pswd.value;
 		const formData = new URLSearchParams();
-    formData.append('email', user);
-    formData.append('password',pass);
+		formData.append('email', user);
+		formData.append('password',pass);
 
 		services.login(formData).then(response => {
 			if(response.status === 200) {
@@ -96,24 +66,6 @@ const Login = () => {
 		e.target.pass.value = '';
 		e.target.passTwo.value = '';
 
-	}
-
-	const login = (e) => {
-		e.preventDefault();
-
-		const user = e.target.email.value;
-		const pass = e.target.pass.value;
-
-		services.login(user,pass).then(response => {
-			if(response.status === 200) {
-				console.log(response);
-			} else {
-				console.log(response.data[0].errorMessage);
-			}
-		});
-
-		e.target.email.value = '';
-		e.target.pass.value = '';
 	}
 
 	const validatePass = (pass, confir) => {
@@ -161,39 +113,35 @@ const Login = () => {
 		const bar = document.getElementsByClassName('strength-bar');
         let barColorClass = 'strength-bar';
 
-		for(var i=0; i < bar.length; i++) {
-			if (strength === 0) {
-				barColorClass = 'strength-bar';
+        for (var i = 0; i < bar.length; i++) {
+            if (strength === 0) {
+                barColorClass = 'strength-bar';
+            }
+            else if (strength === 1) {
+                barColorClass = 'strength-bar low';
+            } else if (strength === 2) {
+                barColorClass = 'strength-bar active';
+            } else if (strength === 3) {
+                barColorClass = 'strength-bar medium';
+            } else if (strength === 4) {
+                barColorClass = 'strength-bar strong';
+            }
+            bar[i].className = barColorClass;
 
-			}
-			else if (strength === 1) {
-			
-				barColorClass = 'strength-bar low';
-			} else if (strength === 2) {
-				barColorClass = 'strength-bar active';
-			
-			} else if (strength === 3) {
-				barColorClass = 'strength-bar medium';
-			} else if (strength === 4) {
-				barColorClass = 'strength-bar strong';
-			}
-			bar[i].className = barColorClass;
+            if (i === strength && strength !== 0) {
+                break;
+            }
+        }
+    };
 
-			if(i === strength && strength !== 0) {
-				break;
-			}
-		}
-	};
-
-	const validateCorreoEdu = (email) => {
-		if(email === '') {
-			setErrorValidateEmail(true);
-		} else {
-			const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]*edu[a-zA-Z0-9.-]*$/;
-			setErrorValidateEmail(regex.test(email));
-		}
-		
-	};
+    const validateCorreoEdu = (email) => {
+        if (email === '') {
+            setErrorValidateEmail(true);
+        } else {
+            const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]*edu[a-zA-Z0-9.-]*$/;
+            setErrorValidateEmail(regex.test(email));
+        }
+    };
 
     return (
         <div className="component-login">
@@ -213,7 +161,6 @@ const Login = () => {
 								type="text" 
 								name="txt" 
 								id="name"
-								name="name"
 								placeholder="Full name" 
 								required="" 
 							/>
@@ -282,6 +229,7 @@ const Login = () => {
 			
 			</div>
     	</div>
+
     );
 };
 
