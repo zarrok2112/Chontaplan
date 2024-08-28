@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './login.css';
 import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
+import Progress from '../component-progress/Progress';
 
 const Login = () => {
 
@@ -12,6 +13,7 @@ const Login = () => {
 	const [messageError, setMessageError] = useState('');
 	const [validateEmail, setValidateEmail] = useState('');
 	const [errorValidateEmail, setErrorValidateEmail] = useState(true);
+	const [progress,setProgress] = useState(false);
 
 	var contador = 0 ;
 
@@ -24,7 +26,9 @@ const Login = () => {
 		formData.append('email', user);
 		formData.append('password',pass);
 
+		setProgress(true)
 		services.login(formData).then(response => {
+			setProgress(false);
 			if(response.status === 200) {
 				console.log(response.data.message);
 			} else {
@@ -52,7 +56,9 @@ const Login = () => {
 			}
 		}
 		
+		setProgress(true);
 		services.signUp(data).then(response => {
+			setProgress(false);
 			if(response.status === 200) {
 				console.log(response);
 				navigate('/home');
@@ -145,6 +151,7 @@ const Login = () => {
 
     return (
         <div className="component-login">
+			{progress ? <Progress />:<></>}
             <div class="mirave">
 				Cali es Cali
 				<br />
