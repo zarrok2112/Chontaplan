@@ -32,6 +32,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    'events',
     'api',
+    'chatbot'
 ]
 
 REST_FRAMEWORK = {
@@ -51,6 +55,8 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = "api.User"
+ASGI_APPLICATION = 'CTP_Backend.asgi.application'
+WSGI_APPLICATION = 'CTP_Backend.wsgi.application'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -83,9 +89,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'CTP_Backend.wsgi.application'
-
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -98,6 +101,15 @@ DATABASES = {
         "HOST":  os.environ.get("PG_CTP_BACKEND_HOST", default="localhost"),
         "PORT":  os.environ.get("PG_CTP_BACKEND_PORT", default="5432"),
     }
+}
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],  # El nombre de servicio de Redis en docker-compose.yml
+        },
+    },
 }
 
 # Password validation
@@ -137,8 +149,8 @@ CORS_ALLOW_HEADERS = [
 ]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=8),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
     'ALGORITHM': 'HS256',

@@ -4,14 +4,7 @@ import os
 from rest_framework import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
-from .models import (
-    Chat,
-    Message,
-    ChatToken,
-    User,
-    Event,
-    EventType
-)
+from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -26,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
         if User.objects.filter(email=value).exists():
             raise serializers.ValidationError("This email is already in use.")
         return value
+
 
 class SignupSerializer(serializers.Serializer):
     user_info = UserSerializer()
@@ -45,33 +39,3 @@ class SignupSerializer(serializers.Serializer):
         user.save()
 
         return {'id': user.id, 'email': user.email}
-    
-
-class MessageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Message
-        fields = ['id', 'chat', 'sender', 'text', 'timestamp']
-
-class ChatSerializer(serializers.ModelSerializer):
-    messages = MessageSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Chat
-        fields = ['id', 'user', 'created_at', 'messages']
-
-class ChatTokenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ChatToken
-        fields = ['chat', 'token']
-
-class EventSerializer(serializers.ModelSerializer):
-    event_type = serializers.PrimaryKeyRelatedField(queryset=EventType.objects.all())
-    created_by = serializers.ReadOnlyField(source='created_by.username')
-
-    class Meta:
-        model = Event
-        fields = [
-            'id', 'name', 'description', 'event_type', 'created_by', 
-            'location', 'brief_description', 'created_at', 
-            'event_start_datetime', 'event_end_datetime', 'status'
-        ]
