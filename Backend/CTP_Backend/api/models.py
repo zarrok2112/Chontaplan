@@ -30,6 +30,7 @@ class UserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(
         primary_key=True,
@@ -92,54 +93,4 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-    
-class Chat(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chats')
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Chat {self.id} for {self.user.username}"
-
-class Message(models.Model):
-    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='messages')
-    sender = models.CharField(max_length=255)  # Could be 'user' or 'bot'
-    text = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Message from {self.sender} at {self.timestamp}"
-
-class ChatToken(models.Model):
-    chat = models.OneToOneField(Chat, on_delete=models.CASCADE, related_name='token')
-    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-
-    def __str__(self):
-        return f"Token {self.token} for Chat {self.chat.id}"
-    
-class EventType(models.Model):
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-    
-class Event(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    event_type = models.ForeignKey(EventType, on_delete=models.CASCADE, related_name='events')
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
-    location = models.TextField()
-    brief_description = models.CharField(max_length=500)
-    created_at = models.DateTimeField(auto_now_add=True)
-    event_start_datetime = models.DateTimeField()
-    event_end_datetime = models.DateTimeField()
-    
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('active', 'Active'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
-    ]
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
-
-    def __str__(self):
-        return self.name
+ 

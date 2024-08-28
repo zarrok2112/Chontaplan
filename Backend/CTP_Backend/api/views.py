@@ -14,22 +14,13 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from .models import (
-    Chat,
-    Message,
-    ChatToken,
-    User,
-    Event
-)
+
+from .models import User
 from .serializers import (
-    ChatSerializer,
-    MessageSerializer,
-    ChatTokenSerializer,
-    EventSerializer,
     UserSerializer,
     SignupSerializer
     )
-from django.contrib.auth.models import User
+
 
 from CTP_Backend.settings import EMAIL_HOST_USER
 
@@ -53,7 +44,7 @@ def signup(request):
 
         token = token_generator.make_token(user)
         reset_url = (
-            f"{os.getenv('LINNDA_BASE_URL')}reset-password?token={token}&user_id={user.id}"
+            f"{os.getenv('LINNDA_BASE_URL')}confirm_singup?token={token}&user_id={user.id}"
         )
 
 
@@ -118,113 +109,3 @@ class ActivateAccountView(APIView):
         else:
             return Response({'message': 'Token inválido o expirado.'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-class CreateChatView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return Response({"error": "Usuario no autenticado."}, status=status.HTTP_401_UNAUTHORIZED)
-        
-        user = request.user
-        chat = Chat.objects.create(user=user)
-        chat_token = ChatToken.objects.create(chat=chat)
-        return Response(ChatTokenSerializer(chat_token).data, status=status.HTTP_201_CREATED)
-    
-class SendMessageView(APIView):
-    def post(self, request, *args, **kwargs):
-        token = request.data.get('token')
-        text = request.data.get('text')
-        
-        try:
-            chat_token = ChatToken.objects.get(token=token)
-            chat = chat_token.chat
-            sender = 'user'
-            message = Message.objects.create(chat=chat, sender=sender, text=text)
-
-            # Aquí es donde se llamaría al chatbot para generar una respuesta.
-            # Respuesta del chatbot simulada:
-            bot_response = "Esta es una respuesta simulada del chatbot."
-            Message.objects.create(chat=chat, sender='bot', text=bot_response)
-
-            return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
-        
-        except ChatToken.DoesNotExist:
-            return Response({"error": "Token no válido."}, status=status.HTTP_400_BAD_REQUEST)
-        
-class ChatbotWebhookView(APIView):
-    def post(self, request, *args, **kwargs):
-        token = request.data.get('token')
-        response_text = request.data.get('response_text')
-
-        try:
-            chat_token = ChatToken.objects.get(token=token)
-            chat = chat_token.chat
-            Message.objects.create(chat=chat, sender='bot', text=response_text)
-            return Response({"message": "Response saved."}, status=status.HTTP_200_OK)
-        
-        except ChatToken.DoesNotExist:
-            return Response({"error": "Token no válido."}, status=status.HTTP_400_BAD_REQUEST)
-        
-class GetMessagesView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        token = request.query_params.get('token')
-        
-        if not token:
-            return Response({"error": "El parámetro 'token' es obligatorio."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            chat_token = ChatToken.objects.get(token=token)
-            chat = chat_token.chat
-            messages = Message.objects.filter(chat=chat)
-            serialized_messages = MessageSerializer(messages, many=True)
-            return Response(serialized_messages.data, status=status.HTTP_200_OK)
-        
-        except ChatToken.DoesNotExist:
-            return Response({"error": "Token no válido."}, status=status.HTTP_400_BAD_REQUEST)
-
-class EventView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
-
-    def get(self, request, *args, **kwargs):
-        event_id = kwargs.get('pk')
-        if event_id:
-            try:
-                event = Event.objects.get(pk=event_id)
-                serializer = EventSerializer(event)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except Event.DoesNotExist:
-                return Response({"error": "Evento no encontrado."}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            events = Event.objects.all()
-            serializer = EventSerializer(events, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, *args, **kwargs):
-        serializer = EventSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(created_by=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, pk=None, *args, **kwargs):
-        try:
-            event = Event.objects.get(pk=pk)
-        except Event.DoesNotExist:
-            return Response({"error": "Evento no encontrado."}, status=status.HTTP_404_NOT_FOUND)
-        
-        serializer = EventSerializer(event, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk=None, *args, **kwargs):
-        try:
-            event = Event.objects.get(pk=pk)
-            event.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Event.DoesNotExist:
-            return Response({"error": "Evento no encontrado."}, status=status.HTTP_404_NOT_FOUND)
