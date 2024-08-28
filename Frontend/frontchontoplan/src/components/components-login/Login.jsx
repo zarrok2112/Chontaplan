@@ -24,13 +24,20 @@ const Login = () => {
 		formData.append('email', user);
 		formData.append('password',pass);
 
-		services.login(formData).then(response => {
-			if(response.status === 200) {
-				console.log(response.data.message);
-			} else {
-				console.log(response.data.message);
-			}
-		});
+		try{
+			services.login(formData).then(response => {
+				if(response.status === 200) {
+					console.log("se logio exitoxamente");
+					navigate('/home');
+				} else {
+					console.log("error");
+				}
+			});
+		}
+		catch(e){
+			console.log("Error "+e);
+		}
+		
 
 		e.target.email.value = '';
 		e.target.pswd.value = '';
@@ -52,14 +59,19 @@ const Login = () => {
 			}
 		}
 		
-		services.signUp(data).then(response => {
-			if(response.status === 200) {
-				console.log(response);
-				navigate('/home');
-			} else {
-				console.log(response.data[0].errorMessage);
-			}
-		})
+		try{
+			services.signUp(data).then(response => {
+				if(response.status === 201) {
+					console.log(response.data.message);
+					console.log("Pendiente confirmacion de correo, recuerden activar el usuario en el admin de django porque sino no ingresa y les da un 401");
+				} else {
+					console.log(response.data[0].errorMessage);
+				}
+			})
+		} catch(e){
+			console.log("error "+e);
+		}
+		
 		
 		e.target.name.value = '';
 		e.target.email.value = '';
