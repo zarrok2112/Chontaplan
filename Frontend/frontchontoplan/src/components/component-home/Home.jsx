@@ -4,7 +4,7 @@ import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import RegisterEvent from "../component-register-event/RegisterEvent";
-import ChatBot from "../component-chat-bot/ChatBot";
+import ChatGPTClone from "../components-chatbot/ChontoChat";
 import Progress from "../component-progress/Progress";
 
 const Home = () => {
@@ -19,7 +19,7 @@ const Home = () => {
                 setTitle("Registrar mi evento");
                 break;
             case 2:
-                setTitle("ChatBot");
+                setTitle("Chontochat");
                 break;
             default:
                 console.log("error :c" +num)
@@ -32,7 +32,7 @@ const Home = () => {
           case 1:
             return <RegisterEvent />;
           case 2:
-            return <ChatBot />;
+            return <ChatGPTClone />;
           default:
             return <div>Select a component</div>;
         }
@@ -57,7 +57,7 @@ const Home = () => {
                     selected={selectedIndex === 2}
                     onClick={(event) => handleListItemClick(event, 2)}
                     >
-                        <ListItemText primary="ChatBot" />
+                        <ListItemText primary="Chontochat" />
                     </ListItemButton>
                 </List>
             </div>

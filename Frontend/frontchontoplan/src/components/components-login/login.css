@@ -1,32 +1,32 @@
 body .component-login {
     
 	background-image: url(../../assets/califondo.jpg);
-    /*background-image: linear-gradient(rgba(235, 79, 6, 0.884), rgba(230, 100, 40, 0.897));*/
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    font-family: 'Jost', sans-serif;
-	}
+	/*background-image: linear-gradient(rgba(235, 79, 6, 0.884), rgba(230, 100, 40, 0.897));*/
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	font-family: 'Jost', sans-serif;
+}
 
 
-	.main {
-		width: 700px;
-		height: 884px;
-		background: red;
-		overflow: hidden;
-		background-image: url(../../assets/chontaduro.jpeg);
-		background-color: #000;
-		background-size: cover;
-		background-position: center;
-		border-radius: 10px;
-		box-shadow: 5px 20px 50px #000;
-	}
+.main {
+	width: 700px;
+	height: 884px;
+	background: red;
+	overflow: hidden;
+	background-image: url(../../assets/chontaduro.jpeg);
+	background-color: #000;
+	background-size: cover;
+	background-position: center;
+	border-radius: 10px;
+	box-shadow: 5px 20px 50px #000;
+}
 
 
 .main div:first-child {
@@ -37,7 +37,8 @@ opacity: 50%;
 #chk{
 	display: none;
 }
-.signup {
+
+.component-login .signup {
     position: relative;
     top: -62px;
     width: 100%;
@@ -50,7 +51,7 @@ opacity: 50%;
     align-items: center;
 }
 
-label{
+.component-login label{
     font-family: 'Valentine Love', sans-serif;
 	color: green;
 	font-size: 2.3em;
@@ -61,7 +62,7 @@ label{
 	cursor: pointer;
 	transition: .5s ease-in-out;
 }
-input{
+.component-login input{
 	width: 60%;
 	height: 20px;
 	background: #e0dede;
@@ -72,7 +73,7 @@ input{
 	outline: none;
 	border-radius: 5px;
 }
-button{
+.component-login button{
 	width: 60%;
 	height: 40px;
 	margin: 10px auto;
@@ -89,10 +90,10 @@ button{
 	transition: .2s ease-in;
 	cursor: pointer;
 }
-button:hover{
+.component-login button:hover{
 	background: #1205a3;
 }
-.login{
+.component-login .login{
 	
 
 	height: 727px;
@@ -109,12 +110,12 @@ button:hover{
 	
 		
 }
-.login label{
+.component-login .login label{
 	color: #f1ce06;
 	transform: scale(.6);
 	
 }
-.login form {
+.component-login .login form {
     margin-top: 109px;
 
 	display: flex;
@@ -126,13 +127,13 @@ button:hover{
 }
 
 
-.signup label {
+.component-login .signup label {
     position: absolute;
     top: 94px;
     right: 82px;
 	font-size: 80px;
 }
-.signup form {
+.component-login .signup form {
     margin-top: 109px;
 	display: flex;
 	flex-direction: column;
