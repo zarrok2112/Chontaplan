@@ -30,7 +30,7 @@ const Login = () => {
 		services.login(formData).then(response => {
 			setProgress(false);
 			if(response.status === 200) {
-				console.log("se logio exitoxamente");
+				console.log("se logio exitosamente");
 				navigate('/home');
 			} else {
 				console.log("error");
@@ -64,7 +64,7 @@ const Login = () => {
 			setProgress(false);
 			if(response.status === 201) {
 				console.log(response.data.message);
-				console.log("Pendiente confirmacion de correo, recuerden activar el usuario en el admin de django porque sino no ingresa y les da un 401");
+				console.log('Por favor revisa tu correo y presiona el link para activar tu cuenta.');
 			} else {
 				console.log(response.data[0].errorMessage);
 			}

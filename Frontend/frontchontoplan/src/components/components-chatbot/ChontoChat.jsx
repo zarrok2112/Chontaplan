@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Chontochat.css';
+import pingui from '../../assets/pingui.png';
 
 const Sidebar = ({ onNewChat, chatHistory, onDeleteChat }) => (
   <div className="sidebar">
@@ -35,7 +36,7 @@ const Sidebar = ({ onNewChat, chatHistory, onDeleteChat }) => (
 const ChatMessage = ({ message }) => (
   <div className={`message ${message.role}`}>
     <img 
-      src={message.role === 'user' ? '/user-avatar.png' : 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/11590438-EWeCIDQnYUKIO0022fK7pwTwHVjdVs.png'} 
+      src={message.role === 'user' ? `${pingui}` : 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/11590438-EWeCIDQnYUKIO0022fK7pwTwHVjdVs.png'} 
       alt={message.role} 
       className="avatar" 
     />
@@ -61,7 +62,7 @@ const ChatInput = ({ onSendMessage, isLoading }) => {
         <input
           type="text"
           className="message-input"
-          placeholder="Type your message here..."
+          placeholder="Escribi ve..."
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSend()}
@@ -91,9 +92,9 @@ const simulateAIResponse = async (message) => {
   const responses = [
     "mira ve te recomiendo esto",
     "pillate ve",
-    "Based on what you've said, I would suggest...",
-    "That's a complex topic. Let me break it down for you...",
-    "I'm not sure I fully understand. Could you rephrase that?",
+    "Según lo que has dicho ve, te sugeriría este evento ve...",
+    "Papi no te entendi ve...",
+    "No entendi mano, repetime ve?",
   ];
   
   return responses[Math.floor(Math.random() * responses.length)];

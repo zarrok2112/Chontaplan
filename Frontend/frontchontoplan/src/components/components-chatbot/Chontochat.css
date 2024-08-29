@@ -4,16 +4,15 @@
   background-color: #f3f4f6;
 }
 
-.sidebar {
+.chat-container .sidebar {
   width: 250px;
-  background-color: #1f2937;
-  color: white;
+  background-color: orange; 
   padding: 1rem;
   display: none;
   overflow-y: auto;
 }
 
-.sidebar-button {
+.chat-container .sidebar-button {
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 1rem;
@@ -26,19 +25,19 @@
   justify-content: center;
 }
 
-.sidebar-button:hover {
+.chat-container .sidebar-button:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.sidebar-button svg {
+.chat-container .sidebar-button svg {
   margin-right: 0.5rem;
 }
 
-.chat-list {
+.chat-container .chat-list {
   margin-top: 1rem;
 }
 
-.chat-list-item {
+.chat-container .chat-list-item {
   padding: 0.5rem;
   cursor: pointer;
   display: flex;
@@ -46,15 +45,15 @@
   justify-content: space-between;
 }
 
-.chat-list-item:hover {
+.chat-container .chat-list-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.chat-list-item svg {
+.chat-container .chat-list-item svg {
   margin-right: 0.5rem;
 }
 
-.delete-chat-button {
+.chat-container .delete-chat-button {
   background: none;
   border: none;
   color: white;
@@ -64,37 +63,37 @@
   transition: opacity 0.2s;
 }
 
-.delete-chat-button:hover {
+.chat-container .delete-chat-button:hover {
   opacity: 1;
 }
 
-.delete-chat-button svg {
+.chat-container .delete-chat-button svg {
   width: 16px;
   height: 16px;
 }
 
-.main-content {
+.chat-container .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.chat-container .header {
+  background-color: #2D6A4F;;
   color: white;
   padding: 1.5rem;
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.header-content {
+.chat-container .header-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
-.header-title {
+.chat-container .header-title {
   font-size: 2.5rem;
   font-weight: bold;
   margin: 0;
@@ -102,73 +101,74 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.header-subtitle {
+.chat-container .header-subtitle {
   font-size: 1rem;
   opacity: 0.9;
   margin-top: 0.5rem;
   font-style: italic;
 }
 
-.menu-button {
+.chat-container .menu-button {
   background: none;
   border: none;
   cursor: pointer;
   margin-right: 1rem;
 }
 
-.chat-messages {
-  flex: 1;
+.chat-container .chat-messages {
+  flex: 1 1;
   overflow-y: auto;
   padding: 1rem;
+  background-color: #40916C;
 }
 
-.message {
+.chat-container .message {
   display: flex;
   margin-bottom: 1rem;
 }
 
-.message.user {
+.chat-container .message.user {
   justify-content: flex-end;
 }
 
-.message-content {
+.chat-container .message-content {
   max-width: 70%;
   padding: 0.75rem;
   border-radius: 0.5rem;
 }
 
-.user .message-content {
+.chat-container .user .message-content {
   background-color: #3b82f6;
   color: white;
 }
 
-.assistant .message-content {
-  background-color: #e5e7eb;
+.chat-container .assistant .message-content {
+  background-color: #c2c2c2;
 }
 
-.avatar {
+.chat-container .avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
   margin-right: 0.5rem;
 }
 
-.user .avatar {
+.chat-container .user .avatar {
   order: 1;
   margin-right: 0;
   margin-left: 0.5rem;
 }
 
-.input-area {
-  border-top: 1px solid #e5e7eb;
+.chat-container .input-area {
   padding: 1rem;
+  background-color: teal;
 }
 
-.input-container {
+.chat-container .input-container {
   display: flex;
 }
 
-.message-input {
+.chat-container .message-input {
   flex: 1;
   padding: 0.5rem;
   border: 1px solid #d1d5db;
@@ -176,11 +176,11 @@
   margin-right: 0.5rem;
 }
 
-.message-input:disabled {
+.chat-container .message-input:disabled {
   background-color: #f3f4f6;
 }
 
-.send-button {
+.chat-container .send-button {
   padding: 0.5rem 1rem;
   background-color: #3b82f6;
   color: white;
@@ -192,16 +192,16 @@
   justify-content: center;
 }
 
-.send-button:hover:not(:disabled) {
+.chat-container .send-button:hover:not(:disabled) {
   background-color: #2563eb;
 }
 
-.send-button:disabled {
+.chat-container .send-button:disabled {
   background-color: #9ca3af;
   cursor: not-allowed;
 }
 
-.animate-spin {
+.chat-container .animate-spin {
   animation: spin 1s linear infinite;
 }
 
@@ -215,7 +215,7 @@
 }
 
 @media (min-width: 768px) {
-  .sidebar {
+  .chat-container .sidebar {
     display: block;
   }
 

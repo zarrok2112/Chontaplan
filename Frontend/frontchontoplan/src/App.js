@@ -2,7 +2,7 @@ import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/components-login/Login.jsx';
 import Home from './components/component-home/Home.jsx';
-import Progress from './components/component-progress/Progress.jsx';
+import ActiveCount from './components/component-active-count/activeCount.jsx';
 
 
 function App() {
@@ -11,6 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/home" element={<Home />} />
+        <Route path="/confirm_singup" element={<ActiveCount />} />
       </Routes>
     </Router>
   );
