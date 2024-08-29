@@ -39,6 +39,8 @@ const Login = () => {
 		
 		
 
+		
+
 		e.target.email.value = '';
 		e.target.pswd.value = '';
 	}
@@ -65,6 +67,7 @@ const Login = () => {
 			if(response.status === 201) {
 				console.log(response.data.message);
 				console.log('Por favor revisa tu correo y presiona el link para activar tu cuenta.');
+
 			} else {
 				console.log(response.data[0].errorMessage);
 			}
