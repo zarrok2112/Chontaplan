@@ -5,10 +5,13 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import RegisterEvent from "../component-register-event/RegisterEvent";
 import ChatBot from "../component-chat-bot/ChatBot";
+import Progress from "../component-progress/Progress";
 
 const Home = () => {
     const [selectedIndex, setSelectedIndex] = useState(1);
     const [title, setTitle] = useState("Registrar mi evento");
+    const [progress, setProgress] = useState(false);
+
     const handleListItemClick = (e, num) => {
         setSelectedIndex(num);
         switch (num) {
@@ -40,6 +43,7 @@ const Home = () => {
     return(
         
         <div className="container-home">
+            {progress ? <Progress /> : <></>}
             <div className="container-left">
                 <h1>{title}</h1>
                 <List component="nav" aria-label="secondary mailbox folder">

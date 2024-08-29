@@ -1,3 +1,7 @@
+body {
+    color: white;
+}
+
 .container-home {
     display: flex;
     flex-direction: row;
@@ -7,13 +11,16 @@
 .container-home .container-left {
     width: 300px;
     height: 100%;
-    background-color: #41916c;
+    background-color: #2D6A4F;
 }
 
 .container-home .container-right {
     flex: 1;
-    background-color: #f8a825;
+    background-color: #F9A826;
     display: flex;
     flex-direction: column;
 }
 
+.css-16ac5r2-MuiButtonBase-root-MuiListItemButton-root.Mui-selected {
+    background-color: #40916C!important;
+}

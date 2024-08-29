@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './login.css';
 import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
+import Progress from '../component-progress/Progress';
 
 const Login = () => {
 
@@ -12,6 +13,7 @@ const Login = () => {
 	const [messageError, setMessageError] = useState('');
 	const [validateEmail, setValidateEmail] = useState('');
 	const [errorValidateEmail, setErrorValidateEmail] = useState(true);
+	const [progress,setProgress] = useState(false);
 
 	var contador = 0 ;
 
@@ -24,19 +26,17 @@ const Login = () => {
 		formData.append('email', user);
 		formData.append('password',pass);
 
-		try{
-			services.login(formData).then(response => {
-				if(response.status === 200) {
-					console.log("se logio exitoxamente");
-					navigate('/home');
-				} else {
-					console.log("error");
-				}
-			});
-		}
-		catch(e){
-			console.log("Error "+e);
-		}
+		setProgress(true);
+		services.login(formData).then(response => {
+			setProgress(false);
+			if(response.status === 200) {
+				console.log("se logio exitoxamente");
+				navigate('/home');
+			} else {
+				console.log("error");
+			}
+		});
+
 		
 
 		e.target.email.value = '';
@@ -48,7 +48,6 @@ const Login = () => {
 		const nombre = e.target.name.value;
 		const correo = e.target.email.value;
 		const contra = e.target.pass.value;
-		const verifiContra = e.target.passTwo.value;
 
 		let data = {
 			"user_info":{
@@ -59,19 +58,17 @@ const Login = () => {
 			}
 		}
 		
-		try{
-			services.signUp(data).then(response => {
-				if(response.status === 201) {
-					console.log(response.data.message);
-					console.log("Pendiente confirmacion de correo, recuerden activar el usuario en el admin de django porque sino no ingresa y les da un 401");
-				} else {
-					console.log(response.data[0].errorMessage);
-				}
-			})
-		} catch(e){
-			console.log("error "+e);
-		}
 		
+		setProgress(true);
+		services.signUp(data).then(response => {
+			setProgress(false);
+			if(response.status === 201) {
+				console.log(response.data.message);
+				console.log("Pendiente confirmacion de correo, recuerden activar el usuario en el admin de django porque sino no ingresa y les da un 401");
+			} else {
+				console.log(response.data[0].errorMessage);
+			}
+		})
 		
 		e.target.name.value = '';
 		e.target.email.value = '';
@@ -157,6 +154,7 @@ const Login = () => {
 
     return (
         <div className="component-login">
+			{progress ? <Progress />:<></>}
             <div class="mirave">
 				Cali es Cali
 				<br />
