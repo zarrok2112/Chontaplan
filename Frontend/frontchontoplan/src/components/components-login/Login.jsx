@@ -6,6 +6,7 @@ import Progress from '../component-progress/Progress';
 import { useDispatch } from 'react-redux';
 import { showAlert } from '../../store/reducerAlert/alertSlice';
 
+
 const Login = () => {
 
 	const navigate = useNavigate();
@@ -16,8 +17,8 @@ const Login = () => {
 	const [validateEmail, setValidateEmail] = useState('');
 	const [errorValidateEmail, setErrorValidateEmail] = useState(true);
 	const [progress,setProgress] = useState(false);
-
 	const dispatch = useDispatch();
+
 
 	var contador = 0 ;
 
@@ -30,6 +31,7 @@ const Login = () => {
 		formData.append('email', user);
 		formData.append('password',pass);
 
+		setProgress(true);
 		services.login(formData).then(response => {
 			setProgress(false);
 			if(response.status === 200) {
@@ -44,8 +46,6 @@ const Login = () => {
 			dispatch(showAlert({ type: 'error', message: 'Error al loguearse' }));
 			console.log("error login "+error);
 		});
-		
-		
 
 		e.target.email.value = '';
 		e.target.pswd.value = '';

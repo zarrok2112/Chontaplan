@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React from "react";
 import './activeCount.css';
 import {useLocation} from 'react-router-dom';
 import services from "../../services/services";
@@ -11,6 +12,8 @@ import { showAlert } from '../../store/reducerAlert/alertSlice';
 const ActiveCount = () => {
 
     const dispatch = useDispatch();
+
+
 
 	const navigate = useNavigate();
     const location = useLocation();
@@ -29,8 +32,6 @@ const ActiveCount = () => {
     }).catch((error)=> {
         dispatch(showAlert({ type: 'error', message: 'Error al activar la cuenta!' }));
         console.log("error active acount "+error);
-       
-        
     });
 
     return(
