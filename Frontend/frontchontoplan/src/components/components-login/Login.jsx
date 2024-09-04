@@ -3,6 +3,9 @@ import './login.css';
 import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
 import Progress from '../component-progress/Progress';
+import { useDispatch } from 'react-redux';
+import { showAlert } from '../../store/reducerAlert/alertSlice';
+
 
 const Login = () => {
 
@@ -14,6 +17,8 @@ const Login = () => {
 	const [validateEmail, setValidateEmail] = useState('');
 	const [errorValidateEmail, setErrorValidateEmail] = useState(true);
 	const [progress,setProgress] = useState(false);
+	const dispatch = useDispatch();
+
 
 	var contador = 0 ;
 
@@ -31,15 +36,16 @@ const Login = () => {
 			setProgress(false);
 			if(response.status === 200) {
 				console.log("se logio exitosamente");
+				dispatch(showAlert({ type: 'success', message: 'Se logio exitosamente!' }));
 				navigate('/home');
 			} else {
-				console.log("error");
+				console.log("error else");
 			}
+		}).catch((error) => {
+			setProgress(false);
+			dispatch(showAlert({ type: 'error', message: 'Error al loguearse' }));
+			console.log("error login "+error);
 		});
-		
-		
-
-		
 
 		e.target.email.value = '';
 		e.target.pswd.value = '';
@@ -65,13 +71,16 @@ const Login = () => {
 		services.signUp(data).then(response => {
 			setProgress(false);
 			if(response.status === 201) {
+				dispatch(showAlert({ type: 'success', message: 'Se registro exitosamente!' }));
 				console.log(response.data.message);
-				console.log('Por favor revisa tu correo y presiona el link para activar tu cuenta.');
-
 			} else {
 				console.log(response.data[0].errorMessage);
 			}
-		})
+		}).catch((error)=>{
+			setProgress(false);
+			dispatch(showAlert({ type: 'error', message: 'Error al registrarse' }));
+			console.log("error signUp "+error);
+		});
 		
 		e.target.name.value = '';
 		e.target.email.value = '';

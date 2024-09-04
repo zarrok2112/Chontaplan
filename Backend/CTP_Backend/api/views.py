@@ -50,8 +50,8 @@ def signup(request):
 
         # Guardar en la base de datos de API
         res_send_message = send_mail(
-            subject='Password Reset',
-            message=f"Use the following link to reset your password: {reset_url}",
+            subject='Active account',
+            message=f"Use the following link to active your acount: {reset_url}",
             from_email=EMAIL_HOST_USER,
             recipient_list=[email]
         )

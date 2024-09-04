@@ -9,9 +9,8 @@ class Services {
             console.log('error '+e);
         }
     }
-
+  
     async login(formdata) {
-
         try {
             return await axios.post('http://localhost:8000/api/v1/user/login/',formdata,{
                 headers: {
@@ -27,7 +26,6 @@ class Services {
     getActiveCount(token,user) {
         console.log(`http://localhost:8000/api/v1/user/signup/confirmed?token=${token}&user_id=${user}`);
         return axios.get(`http://localhost:8000/api/v1/user/signup/confirmed?token=${token}&user_id=${user}`)
-
     }
 }
 
