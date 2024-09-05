@@ -18,6 +18,11 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import services from "../../services/services";
+import Progress from "../component-progress/Progress";
+import { useDispatch } from 'react-redux';
+import { showAlert } from '../../store/reducerAlert/alertSlice';
+import { useSelector } from 'react-redux';
 
 moment.locale('es');
 const localizer = momentLocalizer(moment);
@@ -61,7 +66,13 @@ const RegisterEvent = () => {
         organizerContact: "",
         description: ""
     });
+    const token = useSelector((state) => state.token.value);
     const [currentDate, setCurrentDate] = useState(new Date());
+	const [progress,setProgress] = useState(false);
+
+	const dispatch = useDispatch();
+
+
 
     // Manejar la selección de una casilla en el calendario para crear un evento
     const handleSelectSlot = ({ start, end }) => {
@@ -117,20 +128,38 @@ const RegisterEvent = () => {
 
     // Crear un nuevo evento y agregarlo al estado
     const handleCreateEvent = () => {
+
         // Validar campos requeridos
         if (!newEvent.title || !newEvent.type || !newEvent.start || !newEvent.end) {
             alert("Por favor completa todos los campos requeridos.");
             return;
         }
 
-        setEvents([
-            ...events,
-            {
-                ...newEvent,
-                id: events.length ? events[events.length - 1].id + 1 : 1 // Asignar un ID único
-            },
-        ]);
-        setShowCreateDialog(false);
+        setProgress(true)
+        const dataEvent = {
+            name: newEvent.title,
+            event_type: 1,
+            description:newEvent.description,
+            event_start_datetime:newEvent.start,
+            event_end_datetime:newEvent.end,
+            brief_description:newEvent.description,
+            photo:newEvent.photo,
+            location: newEvent.location,
+            organizerContact: newEvent.organizerContact
+        }
+
+        services.registerEvent(token ,dataEvent).then((response)=>{
+            setProgress(false);
+            if(response.status === 201) {
+                dispatch(showAlert({ type: 'success', message: 'El evento se creo exitosamente!' }));
+                setShowCreateDialog(false);
+            }
+        }).catch((error)=>{
+            setProgress(false);
+            dispatch(showAlert({ type: 'error', message: 'El evento no se creo exitosamente!' }));
+            console.log(error);
+            return;
+        });
     };
 
     // Manejar el clic en un evento para mostrar detalles
@@ -175,6 +204,7 @@ const RegisterEvent = () => {
 
     return (
         <div className="container-calendar-events">
+            {progress ? <Progress /> : <></>}
             {/* Encabezado */}
             <div className="container-top">
                 <div className="container-calendar">
@@ -398,7 +428,7 @@ const RegisterEvent = () => {
                     <Button onClick={handleCloseCreateDialog} color="secondary">
                         Cancelar
                     </Button>
-                    <Button onClick={handleCreateEvent} color="primary">
+                    <Button onClick={()=>handleCreateEvent()} color="primary">
                         Crear
                     </Button>
                 </DialogActions>

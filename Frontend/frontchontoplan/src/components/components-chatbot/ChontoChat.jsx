@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Chontochat.css';
 import pingui from '../../assets/pingui.png';
+import { useSelector } from 'react-redux';
+import services from '../../services/services';
+
 
 const Sidebar = ({ onNewChat, chatHistory, onDeleteChat }) => (
   <div className="sidebar">
@@ -31,12 +34,12 @@ const Sidebar = ({ onNewChat, chatHistory, onDeleteChat }) => (
       ))}
     </div>
   </div>
-)
+);
 
 const ChatMessage = ({ message }) => (
   <div className={`message ${message.role}`}>
     <img 
-      src={message.role === 'user' ? `${pingui}` : 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/11590438-EWeCIDQnYUKIO0022fK7pwTwHVjdVs.png'} 
+      src={message.role === 'user' ? pingui : 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/11590438-EWeCIDQnYUKIO0022fK7pwTwHVjdVs.png'} 
       alt={message.role} 
       className="avatar" 
     />
@@ -44,7 +47,7 @@ const ChatMessage = ({ message }) => (
       {message.content}
     </div>
   </div>
-)
+);
 
 const ChatInput = ({ onSendMessage, isLoading }) => {
   const [inputMessage, setInputMessage] = useState('');
@@ -54,7 +57,7 @@ const ChatInput = ({ onSendMessage, isLoading }) => {
       onSendMessage(inputMessage);
       setInputMessage('');
     }
-  }
+  };
 
   return (
     <div className="input-area">
@@ -83,22 +86,8 @@ const ChatInput = ({ onSendMessage, isLoading }) => {
         </button>
       </div>
     </div>
-  )
-}
-
-const simulateAIResponse = async (message) => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
-  const responses = [
-    "mira ve te recomiendo esto",
-    "pillate ve",
-    "Según lo que has dicho ve, te sugeriría este evento ve...",
-    "Papi no te entendi ve...",
-    "No entendi mano, repetime ve?",
-  ];
-  
-  return responses[Math.floor(Math.random() * responses.length)];
-}
+  );
+};
 
 const ChatGPTClone = () => {
   const [messages, setMessages] = useState([
@@ -106,7 +95,63 @@ const ChatGPTClone = () => {
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
+  const [webSocket, setWebSocket] = useState(null); // Estado para la conexión WebSocket
   const messagesEndRef = useRef(null);
+  const token = useSelector((state) => state.token.value);
+
+  useEffect(() => {
+    // Obtener el token de acceso desde localStorage o desde donde lo tengas guardado
+    const accessToken = token;
+    /* const accessToken = localStorage.getItem('access_token'); */
+
+    if (!accessToken) {
+      console.error('No se encontró el token de acceso. Por favor, inicia sesión primero.');
+      return;
+    }
+
+    services.createChat(accessToken).then((response)=> {
+      console.log(response);
+      
+      if(response.status === 201 && response !== undefined) {
+
+        // Crear la conexión WebSocket
+        /* const ws = new WebSocket(`ws://localhost:8000/ws/chat/?token=${accessToken}`); */
+        const ws = new WebSocket(`ws://localhost:8000/ws/chat/${response.data.token}/`);
+        
+        ws.onopen = () => {
+          console.log('Conexión WebSocket establecida');
+          // Enviar el token de autenticación en la cabecera
+          /* ws.send(JSON.stringify({ type: 'auth', token: response.data.token })); */
+          ws.send(JSON.stringify({  "message": "como te encuentras","sender": "usuario" }));
+        };
+    
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          setMessages((prevMessages) => [...prevMessages, { role: data.sender, content: data.message }]);
+        };
+    
+        ws.onclose = () => {
+          console.log('Conexión WebSocket cerrada');
+        };
+    
+        ws.onerror = (error) => {
+          console.error('Error en la conexión WebSocket:', error);
+        };
+    
+        setWebSocket(ws);
+    
+        return () => {
+          // Cerrar la conexión al desmontar el componente
+          ws.close();
+        };
+      } else {
+        console.log('error en la creacion del chat');
+      }
+    }).catch((error)=>{
+      console.log(error);
+    })
+
+  }, []);
 
   useEffect(() => {
     const savedChatHistory = localStorage.getItem('chatHistory');
@@ -121,36 +166,31 @@ const ChatGPTClone = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }
+  };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async (message) => {
+  const handleSendMessage = (message) => {
     setMessages(prev => [...prev, { role: 'user', content: message }]);
     setIsLoading(true);
 
-    try {
-      const aiResponse = await simulateAIResponse(message);
-      setMessages(prev => [...prev, { role: 'assistant', content: aiResponse }]);
-    } catch (error) {
-      console.error('Error getting AI response:', error);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'I apologize, but I encountered an error. Please try again.' }]);
-    } finally {
-      setIsLoading(false);
+    // Enviar mensaje al servidor WebSocket
+    if (webSocket) {
+      webSocket.send(JSON.stringify({ message: message, sender: 'user' }));
     }
-  }
+  };
 
   const handleNewChat = () => {
     const newChatTitle = messages.length > 1 ? messages[1].content.slice(0, 30) + '...' : 'New Chat';
     setChatHistory(prev => [...prev, { title: newChatTitle, messages: messages }]);
     setMessages([{ role: 'assistant', content: 'Otra cosa ve?' }]);
-  }
+  };
 
   const handleDeleteChat = (index) => {
     setChatHistory(prev => prev.filter((_, i) => i !== index));
-  }
+  };
 
   return (
     <div className="chat-container">
@@ -175,7 +215,7 @@ const ChatGPTClone = () => {
         <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ChatGPTClone;

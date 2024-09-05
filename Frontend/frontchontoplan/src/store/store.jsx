@@ -1,10 +1,12 @@
 // store.js
 import { configureStore } from '@reduxjs/toolkit';
-import alertReducer from './reducerAlert/alertSlice';  // Importa el nuevo reducer de la alerta
+import alertReducer from './reducerAlert/alertSlice';
+import tokenReducer from './reducerToken/tokenSlice';
 
 const store = configureStore({
   reducer: {
-    alert: alertReducer,      // Añade el reducer de la alerta
+    alert: alertReducer, 
+    token:tokenReducer,
   },
 });
 

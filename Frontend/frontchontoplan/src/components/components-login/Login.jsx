@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Progress from '../component-progress/Progress';
 import { useDispatch } from 'react-redux';
 import { showAlert } from '../../store/reducerAlert/alertSlice';
+import { getToken } from '../../store/reducerToken/tokenSlice';
 
 
 const Login = () => {
@@ -36,6 +37,7 @@ const Login = () => {
 			setProgress(false);
 			if(response.status === 200) {
 				console.log("se logio exitosamente");
+				dispatch(getToken({value:response.data.access}));
 				dispatch(showAlert({ type: 'success', message: 'Se logio exitosamente!' }));
 				navigate('/home');
 			} else {
