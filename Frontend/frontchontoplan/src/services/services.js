@@ -24,8 +24,23 @@ class Services {
     }
 
     getActiveCount(token,user) {
-        console.log(`http://localhost:8000/api/v1/user/signup/confirmed?token=${token}&user_id=${user}`);
         return axios.get(`http://localhost:8000/api/v1/user/signup/confirmed?token=${token}&user_id=${user}`)
+    }
+
+    registerEvent(token,data) {
+        return axios.post('http://localhost:8000/api/v1/events/',data,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+             },
+        });
+    }
+
+    createChat(token) {
+        return axios.post('http://localhost:8000/api/v1/chat/create-chat/',undefined,{
+            headers: {
+                Authorization: `Bearer ${token}`,
+             }
+        });
     }
 }
 

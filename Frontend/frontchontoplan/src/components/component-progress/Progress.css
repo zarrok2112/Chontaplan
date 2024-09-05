@@ -5,6 +5,8 @@
     height: 100%;
     text-align: center;
     line-height: 744px;
-    z-index: 10;
+    z-index: 99999999999;
     color: white;
+    top: 0;
+    right: 0;
 }
