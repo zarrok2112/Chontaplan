@@ -45,9 +45,21 @@ const messages = {
 const CustomEvent = ({ event }) => (
   <div className="custom-event">
     {event.name}
-    <span className="event-type"> ({event.event_type})</span>
+    <span className="event-type"> ({getEventTypeName(event.event_type)})</span>
   </div>
 );
+
+// Mapeo de tipos de eventos actualizado
+const eventTypeMap = {
+  1: "Académico",
+  2: "Artístico",
+  3: "Deportivo",
+  4: "Otro",
+};
+
+const getEventTypeName = (eventType) => {
+  return eventTypeMap[eventType] || "Desconocido";
+};
 
 const RegisterEvent = () => {
   const [events, setEvents] = useState([]);
@@ -69,12 +81,15 @@ const RegisterEvent = () => {
 
   const dispatch = useDispatch();
 
+  // Estado para la categoría seleccionada
+  const [selectedCategory, setSelectedCategory] = useState("Todos");
+
   useEffect(() => {
     services
       .getEvents(token)
       .then((response) => {
         if (response.status === 200) {
-          setEvents(response.data);  // Sin conversión manual de fechas
+          setEvents(response.data);
         }
       })
       .catch((error) => {
@@ -155,9 +170,6 @@ const RegisterEvent = () => {
       location: newEvent.location,
     };
 
-    console.log("Tipo de dataEvent:", typeof dataEvent);
-    console.log("Contenido de dataEvent:", dataEvent);
-
     services
       .registerEvent(token, dataEvent)
       .then((response) => {
@@ -183,7 +195,6 @@ const RegisterEvent = () => {
           })
         );
         console.error("Error al crear el evento:", error.response.data);
-        // Si error.response.data es un objeto, puedes imprimirlo de manera más legible:
         if (error.response && error.response.data) {
           console.error(
             "Detalles del error:",
@@ -197,15 +208,9 @@ const RegisterEvent = () => {
   };
 
   const handleEventClick = (event) => {
-    const eventTypeMap = {
-      1: "Académico",
-      2: "Deportivo",
-      3: "Otro",
-    };
-
     const formattedEvent = {
       ...event,
-      event_type_name: eventTypeMap[event.event_type] || "Desconocido", // Asignar el nombre del tipo de evento
+      event_type_name: getEventTypeName(event.event_type),
     };
 
     setSelectedEvent(formattedEvent);
@@ -220,14 +225,6 @@ const RegisterEvent = () => {
   const handleCloseCreateDialog = () => {
     setShowCreateDialog(false);
   };
-
-  const sortedEvents = [...events].sort(
-    (a, b) =>
-      new Date(a.event_start_datetime) - new Date(b.event_start_datetime)
-  );
-  const upcomingEvents = sortedEvents
-    .filter((event) => new Date(event.event_start_datetime) >= new Date())
-    .slice(0, 3);
 
   const handlePrevMonth = () => {
     const prevMonth = moment(currentDate).subtract(1, "months").toDate();
@@ -246,11 +243,22 @@ const RegisterEvent = () => {
     setCurrentDate(newDate);
   };
 
-  const eventTypeMap = {
-    1: "Académico",
-    2: "Deportivo",
-    3: "Otro",
-  };
+  // Filtrar eventos según la categoría seleccionada
+  const filteredEvents = events.filter((event) => {
+    const eventTypeName = getEventTypeName(event.event_type);
+    if (selectedCategory === "Todos") {
+      return true;
+    }
+    return eventTypeName === selectedCategory;
+  });
+
+  const sortedEvents = [...filteredEvents].sort(
+    (a, b) =>
+      new Date(a.event_start_datetime) - new Date(b.event_start_datetime)
+  );
+  const upcomingEvents = sortedEvents
+    .filter((event) => new Date(event.event_start_datetime) >= new Date())
+    .slice(0, 3);
 
   return (
     <div className="container-calendar-events">
@@ -258,6 +266,38 @@ const RegisterEvent = () => {
       {/* Encabezado */}
       <div className="container-top">
         <div className="container-calendar">Calendario Chontaplan</div>
+      </div>
+
+      {/* Menú de categorías */}
+      <div className="category-menu" style={{ marginBottom: "20px" }}>
+        <Button
+          variant={selectedCategory === "Todos" ? "contained" : "outlined"}
+          onClick={() => setSelectedCategory("Todos")}
+          style={{ marginRight: "10px" }}
+        >
+          Todos
+        </Button>
+        <Button
+          variant={selectedCategory === "Académico" ? "contained" : "outlined"}
+          onClick={() => setSelectedCategory("Académico")}
+          style={{ marginRight: "10px" }}
+        >
+          Académico
+        </Button>
+        <Button
+          variant={selectedCategory === "Artístico" ? "contained" : "outlined"}
+          onClick={() => setSelectedCategory("Artístico")}
+          style={{ marginRight: "10px" }}
+        >
+          Artístico
+        </Button>
+        <Button
+          variant={selectedCategory === "Deportivo" ? "contained" : "outlined"}
+          onClick={() => setSelectedCategory("Deportivo")}
+          style={{ marginRight: "10px" }}
+        >
+          Deportivo
+        </Button>
       </div>
 
       {/* Botón para crear un nuevo evento */}
@@ -300,7 +340,7 @@ const RegisterEvent = () => {
       <div className="calendar-container">
         <Calendar
           localizer={localizer}
-          events={events}
+          events={filteredEvents}
           startAccessor={(event) => new Date(event.event_start_datetime)}
           endAccessor={(event) => new Date(event.event_end_datetime)}
           style={{ height: 500 }}
@@ -311,7 +351,7 @@ const RegisterEvent = () => {
           components={{
             event: CustomEvent,
           }}
-          views={['month', 'day', 'agenda']}
+          views={["month", "day", "agenda"]}
           date={currentDate}
           onNavigate={(date) => setCurrentDate(date)}
         />
@@ -329,7 +369,7 @@ const RegisterEvent = () => {
                       event.event_start_datetime
                     ).format("LLL")}`}
                     secondary={`Tipo: ${
-                      eventTypeMap[event.event_type] || "Desconocido"
+                      getEventTypeName(event.event_type) || "Desconocido"
                     }`}
                   />
                 </ListItem>
@@ -403,7 +443,7 @@ const RegisterEvent = () => {
             onChange={handleInputChange}
             required
           />
-          <FormControl fullWidth margin="dense">
+          <FormControl fullWidth margin="dense" required>
             <InputLabel id="type-label">Tipo de Evento</InputLabel>
             <Select
               labelId="type-label"
@@ -411,11 +451,11 @@ const RegisterEvent = () => {
               value={newEvent.type}
               onChange={handleInputChange}
               label="Tipo de Evento"
-              required
             >
               <MenuItem value={1}>Académico</MenuItem>
-              <MenuItem value={2}>Deportivo</MenuItem>
-              <MenuItem value={3}>Otro</MenuItem>
+              <MenuItem value={2}>Artístico</MenuItem>
+              <MenuItem value={3}>Deportivo</MenuItem>
+              <MenuItem value={4}>Otro</MenuItem>
             </Select>
           </FormControl>
           <TextField
