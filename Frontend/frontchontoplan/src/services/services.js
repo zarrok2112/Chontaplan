@@ -10,7 +10,7 @@ class Services {
         }
     }
   
-    async login(formdata) {
+    async loginService(formdata) {
         try {
             return await axios.post('http://localhost:8000/api/v1/user/login/',formdata,{
                 headers: {

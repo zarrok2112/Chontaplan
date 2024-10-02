@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './login.css';
+import './Login.css';
 import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
 import Progress from '../component-progress/Progress';
@@ -23,7 +23,7 @@ const Login = () => {
 
 	var contador = 0 ;
 
-	const login = (e) => {
+	const onclickLogin = (e) => {
 		e.preventDefault();
 
 		const user = e.target.email.value;
@@ -33,7 +33,7 @@ const Login = () => {
 		formData.append('password',pass);
 
 		setProgress(true);
-		services.login(formData).then(response => {
+		services.loginService(formData).then(response => {
 			setProgress(false);
 			if(response.status === 200) {
 				console.log("se logio exitosamente");
@@ -172,7 +172,7 @@ const Login = () => {
             <div class="mirave">
 				Cali es Cali
 				<br />
-				<spam>lo demás es loma </spam>
+				<span>lo demás es loma </span>
 			</div>
 
 			<div class="main">  	
@@ -180,19 +180,19 @@ const Login = () => {
 
 					<div class="signup">
 						<form onSubmit={registrarUsuario}>
-							<label for="chk" aria-hidden="true">Registro</label>
+							<label htmlFor="chk" aria-hidden="true">Registro</label>
 							<input 
 								type="text" 
 								name="txt" 
 								id="name"
-								placeholder="Full name" 
+								placeholder="Full name (Registro)" 
 								required="" 
 							/>
 							<input 
 								type="email" 
 								name="email" 
 								id="email"
-								placeholder="Email" 
+								placeholder="Email (Registro)" 
 								required=""
 								value={validateEmail}
 								onChange={(e) => {
@@ -205,7 +205,7 @@ const Login = () => {
 								type="password" 
 								name="pass"
 								id="pass"
-								placeholder="Password" 
+								placeholder="Password (Registro)" 
 								required=""
 								value = {isValidatePassword}
 								onChange={(e)=>{
@@ -227,7 +227,7 @@ const Login = () => {
 								type="password"
 								name="passTwo" 
 								id="passTwo"
-								placeholder="Repeat password" 
+								placeholder="Repeat (Registro)" 
 								required=""
 								value={isConfirmPassword}
 								onChange={(e)=>{
@@ -242,10 +242,10 @@ const Login = () => {
 			
 					<div class="login">
 
-							<label for="chk" aria-hidden="true">Inicio</label>
-						<form onSubmit={login}>
+							<label htmlFor="chk" aria-hidden="true">Inicio</label>
+						<form onSubmit={onclickLogin}>
 							<input type="email" name="email" id="email" placeholder="Email" required="" />
-							<input type="password" name="pswd" id="pass" placeholder="Password" required="" />
+							<input type="password" name="pswd" id="pass" placeholder="Password (Inicio de sesión)" required="" />
 
 							<button type="submit" id="disparo">Iniciar</button>
 						</form>
