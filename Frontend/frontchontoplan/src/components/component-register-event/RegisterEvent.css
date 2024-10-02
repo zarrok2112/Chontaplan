@@ -61,12 +61,79 @@
     top: 10%;
     left: 50%;
     transform: translate(-50%, 0);
-    background-color: white;
+    background-color: #fff;
     padding: 20px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    width: 300px;
-    border-radius: 8px;
+    width: 350px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    animation: slideIn 0.4s ease-out;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+}
+
+/* Para agregar una animación de entrada suave */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -30%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.popup-content {
+    position: relative;
+}
+
+/* Mejorar el estilo del título */
+.event-popup h3 {
+    margin-top: 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 10px;
+}
+
+/* Mejorar el estilo de las etiquetas */
+.event-popup p {
+    margin: 10px 0;
+    font-size: 1em;
+    color: #666;
+}
+
+.event-popup p strong {
+    color: #333;
+    font-weight: bold;
+}
+
+/* Botón de cerrar más atractivo */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 1.5em;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+/* Mejora para dispositivos móviles */
+@media (max-width: 600px) {
+    .event-popup {
+        width: 90%;
+        top: 15%;
+    }
 }
 
 .popup-content {

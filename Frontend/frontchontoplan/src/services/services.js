@@ -35,6 +35,14 @@ class Services {
         });
     }
 
+    getEvents(token) {
+        return axios.get('http://localhost:8000/api/v1/events/', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+    }
+
     createChat(token) {
         return axios.post('http://localhost:8000/api/v1/chat/create-chat/',undefined,{
             headers: {
