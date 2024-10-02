@@ -93,6 +93,7 @@ const ChatGPTClone = () => {
   const [messages, setMessages] = useState([
     { role: 'assistant', content: 'Contame ve, que necesitas?' },
   ]);
+  const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [webSocket, setWebSocket] = useState(null); // Estado para la conexión WebSocket
@@ -105,7 +106,8 @@ const ChatGPTClone = () => {
     /* const accessToken = localStorage.getItem('access_token'); */
 
     if (!accessToken) {
-      console.error('No se encontró el token de acceso. Por favor, inicia sesión primero.');
+      console.log('No se encontró el token de acceso. Por favor, inicia sesión primero.');
+      setErrorMessage('No se encontró el token de acceso. Por favor, inicia sesión primero.');
       return;
     }
 
@@ -135,7 +137,7 @@ const ChatGPTClone = () => {
         };
     
         ws.onerror = (error) => {
-          console.error('Error en la conexión WebSocket:', error);
+          console.log('Error en la conexión WebSocket:', error);
         };
     
         setWebSocket(ws);
@@ -165,7 +167,9 @@ const ChatGPTClone = () => {
   }, [chatHistory]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   useEffect(() => {
@@ -194,6 +198,7 @@ const ChatGPTClone = () => {
 
   return (
     <div className="chat-container">
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
       <Sidebar onNewChat={handleNewChat} chatHistory={chatHistory} onDeleteChat={handleDeleteChat} />
       <div className="main-content">
         <header className="header">

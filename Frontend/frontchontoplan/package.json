@@ -8,8 +8,6 @@
     "@mui/icons-material": "^6.0.0",
     "@mui/material": "^5.16.7",
     "@reduxjs/toolkit": "^2.2.7",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.4",
     "moment": "^2.30.1",
@@ -45,5 +43,22 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "babel-jest": "^29.7.0",
+    "jest": "^27.5.1",
+    "redux-mock-store": "^1.5.4"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(axios)/)" 
+    ]
+  },
+  "presets": ["@babel/preset-env", "@babel/preset-react"]
+
 }
