@@ -1,0 +1,24 @@
+FROM --platform=linux/x86-64 python:3.9
+
+WORKDIR /usr/src/app/CTP_Backend
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# install system dependencies
+RUN apt-get update \
+  && apt-get -y install netcat-openbsd gcc postgresql \
+  && apt-get clean
+
+# install python dependencies
+RUN pip install --upgrade pip
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
+
+COPY . .
+
+# Expose port
+EXPOSE 8000
+
+CMD python /CTP_Backend/manage.py collectstatic --noinput; python manage.py migrate; gunicorn api.wsgi:application --bind 0.0.0.0:8000

@@ -1,0 +1,6 @@
+ROLE_EVENT_ORGANIZATION = 0
+ROLE_TOURIST = 1
+USER_ROLE_CHOICES = (
+    (ROLE_EVENT_ORGANIZATION,' event_organization'),
+    (ROLE_TOURIST,'tourist')
+)

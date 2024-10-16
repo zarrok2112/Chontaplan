@@ -1,0 +1,198 @@
+/* src/components/component-register-event/RegisterEvent.css */
+
+.container-calendar-events {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+}
+
+.container-top {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.container-calendar {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.event-creation-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.calendar-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-navigation button {
+    margin: 0 10px;
+    font-size: 1.2em;
+}
+
+.calendar-container {
+    margin-bottom: 20px;
+}
+
+.container-bottom {
+    text-align: center;
+}
+
+.container-events {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.custom-event {
+    transition: transform 0.2s;
+}
+
+.custom-event:hover {
+    transform: scale(1.1);
+    z-index: 2;
+}
+
+.event-popup {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 350px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    animation: slideIn 0.4s ease-out;
+    font-family: 'Arial', sans-serif;
+    overflow: hidden;
+}
+
+/* Para agregar una animación de entrada suave */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -30%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+.popup-content {
+    position: relative;
+}
+
+/* Mejorar el estilo del título */
+.event-popup h3 {
+    margin-top: 0;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 10px;
+}
+
+/* Mejorar el estilo de las etiquetas */
+.event-popup p {
+    margin: 10px 0;
+    font-size: 1em;
+    color: #666;
+}
+
+.event-popup p strong {
+    color: #333;
+    font-weight: bold;
+}
+
+/* Botón de cerrar más atractivo */
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 1.5em;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+/* Mejora para dispositivos móviles */
+@media (max-width: 600px) {
+    .event-popup {
+        width: 90%;
+        top: 15%;
+    }
+}
+
+.popup-content {
+    position: relative;
+}
+
+.popup-content h3 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.popup-content img {
+    margin-top: 10px;
+    border-radius: 4px;
+}
+
+.popup-content p {
+    margin: 10px 0;
+}
+
+.event-popup button {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.event-popup button:hover {
+    background-color: #0056b3;
+}
+
+/* Opcional: Estilos para el popup de creación de evento */
+.MuiDialogTitle-root {
+    position: relative;
+}
+
+.custom-event-type {
+    font-size: 0.8em;
+    color: #fff;
+}
+
+
+.container-calendar-events .container-top {
+    flex: 1;
+}
+
+.container-calendar-events .container-bottom {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.container-calendar-events .container-bottom .container-events {
+    width: 100%;
+    height: 200px;
+    background-color: #41916c;
+    border: 10px solid black;
+}

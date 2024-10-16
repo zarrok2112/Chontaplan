@@ -1,0 +1,12 @@
+.container-progress {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    line-height: 744px;
+    z-index: 99999999999;
+    color: white;
+    top: 0;
+    right: 0;
+}
