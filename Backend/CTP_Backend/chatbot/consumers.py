@@ -1,6 +1,8 @@
 import json
+
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.db import database_sync_to_async 
+from channels.db import database_sync_to_async
+from CTP_Backend.utils.pento import LdaPento
 from .models import ChatToken, Message, Chat
 
 
@@ -43,9 +45,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if message and sender:
             # Guardar el mensaje en la base de datos
             await self.save_message(self.chat, sender, message)
+            api_key = "1c8d9b79243d21c40bb1534f7e59ac765a57182ae6efa5af199524915a098ecc"
 
+            pento = LdaPento(api_key=api_key)
             # Responder con "dijiste..."
-            response_message = f'Dijiste: {message}'
+            response_message = pento.insights_pipeline(text=message)
+            print(response_message)
             await self.send(text_data=json.dumps({
                 'message': response_message,
                 'sender': 'Chatbot'
