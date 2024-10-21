@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
 import './login.css';
+import './login.css';
 import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
 import Progress from '../component-progress/Progress';
 import { useDispatch } from 'react-redux';
 import { showAlert } from '../../store/reducerAlert/alertSlice';
 import { getToken } from '../../store/reducerToken/tokenSlice';
+import { isActive } from '../../store/reducerSession/sessionSlice';
+import { GoogleLogin } from 'react-google-login';
+import { gapi } from 'gapi-script';
+
+const CLIENT_ID = 'ANDRESAQUIVATUID.apps.googleusercontent.com';
+
 
 const Login = () => {
     const navigate = useNavigate();
@@ -18,7 +25,69 @@ const Login = () => {
     const [errorValidateEmail, setErrorValidateEmail] = useState(true);
     const [progress, setProgress] = useState(false);
 
-    var contador = 0;
+
+	var contador = 0 ;
+
+	const onSuccess = (response) => {
+		dispatch(isActive({isActive: true,infoUser:response.profileObj}));
+	};
+
+	const onFailure = (response) => {
+		var msgError = 'Error en el inicio de sesión:', response;
+		dispatch(showAlert({ type: 'error', message: msgError }));
+	};
+
+	const initializeGAPI = () => {
+		gapi.client.init({
+		  apiKey: 'ANDRESAQUIVAELAPIKEY',
+		  clientId: CLIENT_ID,
+		  discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+		  scope: 'https://www.googleapis.com/auth/calendar',
+		}).then(() => {
+		  console.log('GAPI initialized');
+		});
+	};
+
+	const listEvents = () => {
+	gapi.client.calendar.events.list({
+		'calendarId': 'primary',
+		'timeMin': (new Date()).toISOString(),
+		'maxResults': 10,
+		'singleEvents': true,
+		'orderBy': 'startTime',
+	}).then((response) => {
+		const events = response.result.items;
+		if (events.length > 0) {
+		console.log('Próximos eventos:', events);
+		} else {
+		console.log('No hay eventos próximos.');
+		}
+	});
+	};
+
+	const addEvent = () => {
+		const event = {
+			summary: 'Nuevo Evento',
+			location: 'Ubicación',
+			description: 'Descripción del evento',
+			start: {
+			dateTime: '2024-10-20T09:00:00-07:00',
+			timeZone: 'America/Los_Angeles',
+			},
+			end: {
+			dateTime: '2024-10-20T10:00:00-07:00',
+			timeZone: 'America/Los_Angeles',
+			},
+		};
+
+		gapi.client.calendar.events.insert({
+			calendarId: 'primary',
+			resource: event,
+		}).then((response) => {
+			console.log('Evento creado:', response.result.htmlLink);
+		});
+	};
+	
 
     const onclickLogin = (e) => {
         e.preventDefault();
@@ -232,33 +301,46 @@ const Login = () => {
                             </div>
                         </div>
 
-                        <input
-                            type="password"
-                            name="passTwo"
-                            id="passTwo"
-                            placeholder="Repeat (Registro)"
-                            required=""
-                            value={isConfirmPassword}
-                            onChange={(e) => {
-                                setIsConfirmPassword(e.target.value);
-                                validatePass(isValidatePassword, e.target.value);
-                            }}
-                        />
-                        {messageError && <p style={{ color: 'white' }}>{messageError}</p>}
-                        <button type="submit" id="joinus">Registrar</button>
-                    </form>
-                </div>
+							<input 
+								type="password"
+								name="passTwo" 
+								id="passTwo"
+								placeholder="Repeat (Registro)" 
+								required=""
+								value={isConfirmPassword}
+								onChange={(e)=>{
+									setIsConfirmPassword(e.target.value);
+									validatePass(isValidatePassword,e.target.value);
+								}}
+							/>
+							{messageError && <p style={{color:'white'}}>{messageError}</p>}
+							<button className="btn-registry" type="submit" id="joinus">Registrar</button>
+						</form>
+					</div>
+			
+					<div class="login">
 
-                <div className="login">
-                    <label htmlFor="chk" aria-hidden="true">Inicio</label>
-                    <form onSubmit={onclickLogin}>
-                        <input type="email" name="email" id="email" placeholder="Email" required="" />
-                        <input type="password" name="pswd" id="pass" placeholder="Password (Inicio de sesión)" required="" />
-                        <button type="submit" id="disparo">Iniciar</button>
-                    </form>
-                </div>
-            </div>
-        </div>
+							<label htmlFor="chk" aria-hidden="true">Inicio</label>
+						<form onSubmit={onclickLogin}>
+							<input type="email" name="email" id="email" placeholder="Email" required="" />
+							<input type="password" name="pswd" id="pass" placeholder="Password (Inicio de sesión)" required="" />
+
+							<button className="btn-login" type="submit" id="disparo">Iniciar</button>
+						</form>
+						<div className='btn-google'>
+							<GoogleLogin
+								clientId={CLIENT_ID}
+								buttonText="Iniciar sesión con Google"
+								onSuccess={onSuccess}
+								onFailure={onFailure}
+								cookiePolicy={'single_host_origin'}
+							/>
+						</div>
+					</div>
+			
+			</div>
+    	</div>
+
     );
 };
 
