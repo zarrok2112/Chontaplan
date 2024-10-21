@@ -51,3 +51,57 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+version: '3.7'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.local
+    image: ctp-frontend
+    command: npm start
+    volumes:
+      - ./frontend/frontchontoplan/:/usr/src/app/
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.local
+    image: ctp-backend
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - backend/.env
+    volumes:
+      - ./backend/:/usr/src/app/
+      - ./backend/static_volume:/usr/src/app/staticfiles
+      - ./backend/media_volume:/usr/src/app/mediafiles
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres
+    volumes:
+      - .:/tmp/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=foo
+  mongodb:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: testpwd
+      MONGO_INITDB_DATABASE: testdb
+    ports:
+      - "27017:27017"
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
