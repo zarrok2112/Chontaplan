@@ -18,6 +18,7 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete"; // Importar DeleteIcon
 import services from "../../services/services";
 import Progress from "../component-progress/Progress";
 import { useDispatch, useSelector } from "react-redux";
@@ -41,13 +42,6 @@ const messages = {
   noEventsInRange: "No hay eventos en este rango",
   showMore: (total) => `+ Ver más (${total})`,
 };
-
-const CustomEvent = ({ event }) => (
-  <div className="custom-event">
-    {event.name}
-    <span className="event-type"> ({getEventTypeName(event.event_type)})</span>
-  </div>
-);
 
 // Mapeo de tipos de eventos actualizado
 const eventTypeMap = {
@@ -226,21 +220,36 @@ const RegisterEvent = () => {
     setShowCreateDialog(false);
   };
 
-  const handlePrevMonth = () => {
-    const prevMonth = moment(currentDate).subtract(1, "months").toDate();
-    setCurrentDate(prevMonth);
-  };
-
-  const handleNextMonth = () => {
-    const nextMonth = moment(currentDate).add(1, "months").toDate();
-    setCurrentDate(nextMonth);
-  };
-
-  const handleMonthChange = (e) => {
-    const month = e.target.value;
-    const year = moment(currentDate).year();
-    const newDate = new Date(year, month, 1);
-    setCurrentDate(newDate);
+  const handleDeleteEvent = () => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar este evento?")) {
+      setProgress(true);
+      services
+        .deleteEvent(token, selectedEvent.id)
+        .then((response) => {
+          setProgress(false);
+          if (response.status === 204) {
+            dispatch(
+              showAlert({
+                type: "success",
+                message: "El evento se eliminó exitosamente!",
+              })
+            );
+            // Actualiza la lista de eventos
+            setEvents(events.filter((event) => event.id !== selectedEvent.id));
+            handleClosePopup();
+          }
+        })
+        .catch((error) => {
+          setProgress(false);
+          dispatch(
+            showAlert({
+              type: "error",
+              message: "El evento no se pudo eliminar.",
+            })
+          );
+          console.error("Error al eliminar el evento:", error);
+        });
+    }
   };
 
   // Filtrar eventos según la categoría seleccionada
@@ -311,31 +320,6 @@ const RegisterEvent = () => {
         </Button>
       </div>
 
-      {/* Navegación del calendario */}
-      <div className="calendar-navigation">
-        <Button onClick={handlePrevMonth}>◄</Button>
-        <FormControl
-          variant="outlined"
-          size="small"
-          style={{ minWidth: 120, margin: "0 10px" }}
-        >
-          <InputLabel id="month-select-label">Mes</InputLabel>
-          <Select
-            labelId="month-select-label"
-            value={moment(currentDate).month()}
-            onChange={handleMonthChange}
-            label="Mes"
-          >
-            {moment.months().map((month, index) => (
-              <MenuItem key={index} value={index}>
-                {month}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Button onClick={handleNextMonth}>►</Button>
-      </div>
-
       {/* Calendario */}
       <div className="calendar-container">
         <Calendar
@@ -394,6 +378,17 @@ const RegisterEvent = () => {
             >
               <CloseIcon />
             </IconButton>
+
+            {/* Botón de eliminar */}
+            <IconButton
+              aria-label="delete"
+              onClick={handleDeleteEvent}
+              className="delete-btn"
+              style={{ position: "absolute", right: "45px", top: "-33px" }}
+            >
+              <DeleteIcon />
+            </IconButton>
+
             <h3>{selectedEvent.name}</h3>
             <p>
               <strong>Tipo de Evento:</strong> {selectedEvent.event_type_name}
@@ -535,5 +530,13 @@ const RegisterEvent = () => {
     </div>
   );
 };
+
+// Componente personalizado para los eventos
+const CustomEvent = ({ event }) => (
+  <div className="custom-event">
+    {event.name}
+    <span className="event-type"> ({getEventTypeName(event.event_type)})</span>
+  </div>
+);
 
 export default RegisterEvent;
