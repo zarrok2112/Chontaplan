@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Login.css';
+import './login.css';
 import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
 import Progress from '../component-progress/Progress';
