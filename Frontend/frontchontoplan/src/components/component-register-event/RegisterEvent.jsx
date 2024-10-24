@@ -18,7 +18,8 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import { IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import DeleteIcon from "@mui/icons-material/Delete"; // Importar DeleteIcon
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit"; // Importar EditIcon
 import services from "../../services/services";
 import Progress from "../component-progress/Progress";
 import { useDispatch, useSelector } from "react-redux";
@@ -69,6 +70,8 @@ const RegisterEvent = () => {
     description: "",
     briefDescription: "",
   });
+  const [showEditDialog, setShowEditDialog] = useState(false); // Nuevo estado
+  const [editEvent, setEditEvent] = useState(null); // Nuevo estado
   const token = useSelector((state) => state.token.value);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [progress, setProgress] = useState(false);
@@ -252,6 +255,89 @@ const RegisterEvent = () => {
     }
   };
 
+  const handleEditEvent = () => {
+    setEditEvent({
+      ...selectedEvent,
+      title: selectedEvent.name,
+      start: new Date(selectedEvent.event_start_datetime),
+      end: new Date(selectedEvent.event_end_datetime),
+      type: selectedEvent.event_type,
+      location: selectedEvent.location,
+      description: selectedEvent.description,
+      briefDescription: selectedEvent.brief_description,
+    });
+    setShowEditDialog(true);
+    setShowPopup(false);
+  };
+
+  const handleEditInputChange = (e) => {
+    const { name, value } = e.target;
+    let newValue = value;
+
+    // Si el campo es 'type', conviértelo a entero
+    if (name === "type") {
+      newValue = parseInt(value, 10);
+    }
+
+    setEditEvent({
+      ...editEvent,
+      [name]: newValue,
+    });
+  };
+
+  const handleUpdateEvent = () => {
+    // Validar campos requeridos
+    if (!editEvent.title || !editEvent.type || !editEvent.start || !editEvent.end) {
+      alert("Por favor completa todos los campos requeridos.");
+      return;
+    }
+
+    setProgress(true);
+
+    const dataEvent = {
+      name: editEvent.title,
+      event_type: editEvent.type,
+      description: editEvent.description,
+      event_start_datetime: moment(editEvent.start).format(
+        "YYYY-MM-DDTHH:mm:ss"
+      ),
+      event_end_datetime: moment(editEvent.end).format("YYYY-MM-DDTHH:mm:ss"),
+      brief_description: editEvent.briefDescription,
+      location: editEvent.location,
+    };
+
+    services
+      .updateEvent(token, editEvent.id, dataEvent)
+      .then((response) => {
+        setProgress(false);
+        if (response.status === 200) {
+          dispatch(
+            showAlert({
+              type: "success",
+              message: "El evento se actualizó exitosamente!",
+            })
+          );
+          setShowEditDialog(false);
+          // Actualiza la lista de eventos
+          setEvents(
+            events.map((event) =>
+              event.id === editEvent.id ? response.data : event
+            )
+          );
+        }
+      })
+      .catch((error) => {
+        setProgress(false);
+        dispatch(
+          showAlert({
+            type: "error",
+            message: "El evento no se pudo actualizar.",
+          })
+        );
+        console.error("Error al actualizar el evento:", error);
+      });
+  };
+
   // Filtrar eventos según la categoría seleccionada
   const filteredEvents = events.filter((event) => {
     const eventTypeName = getEventTypeName(event.event_type);
@@ -374,7 +460,7 @@ const RegisterEvent = () => {
             <IconButton
               aria-label="close"
               onClick={handleClosePopup}
-              style={{ position: "absolute", right: "-15px", top: "-33px" }}
+              style={{ position: "absolute", right: "-15px", top: "-20px" }}
             >
               <CloseIcon />
             </IconButton>
@@ -384,9 +470,19 @@ const RegisterEvent = () => {
               aria-label="delete"
               onClick={handleDeleteEvent}
               className="delete-btn"
-              style={{ position: "absolute", right: "45px", top: "-33px" }}
+              style={{ position: "absolute", right: "33px", top: "-20px" }}
             >
               <DeleteIcon />
+            </IconButton>
+
+            {/* Botón de editar */}
+            <IconButton
+              aria-label="edit"
+              onClick={handleEditEvent}
+              className="edit-btn"
+              style={{ position: "absolute", right: "80px", top: "-20px" }}
+            >
+              <EditIcon />
             </IconButton>
 
             <h3>{selectedEvent.name}</h3>
@@ -527,6 +623,125 @@ const RegisterEvent = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Dialog para editar un evento */}
+      {editEvent && (
+        <Dialog
+          open={showEditDialog}
+          onClose={() => setShowEditDialog(false)}
+          fullWidth
+          maxWidth="sm"
+        >
+          <DialogTitle>
+            Editar Evento
+            <IconButton
+              aria-label="close"
+              onClick={() => setShowEditDialog(false)}
+              style={{ position: "absolute", right: "10px", top: "10px" }}
+            >
+              <CloseIcon />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              margin="dense"
+              label="Título del Evento"
+              name="title"
+              fullWidth
+              value={editEvent.title}
+              onChange={handleEditInputChange}
+              required
+            />
+            <FormControl fullWidth margin="dense" required>
+              <InputLabel id="type-label">Tipo de Evento</InputLabel>
+              <Select
+                labelId="type-label"
+                name="type"
+                value={editEvent.type}
+                onChange={handleEditInputChange}
+                label="Tipo de Evento"
+              >
+                <MenuItem value={1}>Académico</MenuItem>
+                <MenuItem value={2}>Artístico</MenuItem>
+                <MenuItem value={3}>Deportivo</MenuItem>
+                <MenuItem value={4}>Otro</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              margin="dense"
+              label="Hora de Inicio"
+              name="start"
+              type="datetime-local"
+              fullWidth
+              value={
+                editEvent.start
+                  ? moment(editEvent.start).format("YYYY-MM-DDTHH:mm")
+                  : ""
+              }
+              onChange={(e) =>
+                setEditEvent({ ...editEvent, start: new Date(e.target.value) })
+              }
+              InputLabelProps={{
+                shrink: true,
+              }}
+              required
+            />
+            <TextField
+              margin="dense"
+              label="Hora de Finalización"
+              name="end"
+              type="datetime-local"
+              fullWidth
+              value={
+                editEvent.end
+                  ? moment(editEvent.end).format("YYYY-MM-DDTHH:mm")
+                  : ""
+              }
+              onChange={(e) =>
+                setEditEvent({ ...editEvent, end: new Date(e.target.value) })
+              }
+              InputLabelProps={{
+                shrink: true,
+              }}
+              required
+            />
+            <TextField
+              margin="dense"
+              label="Localización"
+              name="location"
+              fullWidth
+              value={editEvent.location}
+              onChange={handleEditInputChange}
+            />
+            <TextField
+              margin="dense"
+              label="Breve Descripción"
+              name="briefDescription"
+              fullWidth
+              value={editEvent.briefDescription}
+              onChange={handleEditInputChange}
+            />
+            <TextField
+              margin="dense"
+              label="Descripción"
+              name="description"
+              fullWidth
+              multiline
+              rows={4}
+              value={editEvent.description}
+              onChange={handleEditInputChange}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowEditDialog(false)} color="secondary">
+              Cancelar
+            </Button>
+            <Button onClick={handleUpdateEvent} color="primary">
+              Actualizar
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </div>
   );
 };
