@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './Chontochat.css';
-import pingui from '../../assets/pingui.png';
 import { useSelector } from 'react-redux';
 import services from '../../services/services';
-
+import './Chontochat.css';
+import pingui from '../../assets/pingui.png';
 
 const Sidebar = ({ onNewChat, chatHistory, onDeleteChat }) => (
   <div className="sidebar">
@@ -53,7 +52,7 @@ const ChatInput = ({ onSendMessage, isLoading }) => {
   const [inputMessage, setInputMessage] = useState('');
 
   const handleSend = () => {
-    if (inputMessage.trim() !== '' && !isLoading) {
+    if (inputMessage.trim() !== '') {
       onSendMessage(inputMessage);
       setInputMessage('');
     }
@@ -69,7 +68,6 @@ const ChatInput = ({ onSendMessage, isLoading }) => {
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-          disabled={isLoading}
         />
         <button className="send-button" onClick={handleSend} disabled={isLoading}>
           {isLoading ? (
@@ -93,41 +91,33 @@ const ChatGPTClone = () => {
   const [messages, setMessages] = useState([
     { role: 'assistant', content: 'Contame ve, que necesitas?' },
   ]);
+  const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
-  const [webSocket, setWebSocket] = useState(null); // Estado para la conexión WebSocket
+  const [webSocket, setWebSocket] = useState(null);
   const messagesEndRef = useRef(null);
   const token = useSelector((state) => state.token.value);
 
   useEffect(() => {
-    // Obtener el token de acceso desde localStorage o desde donde lo tengas guardado
-    const accessToken = token;
-    /* const accessToken = localStorage.getItem('access_token'); */
-
-    if (!accessToken) {
-      console.error('No se encontró el token de acceso. Por favor, inicia sesión primero.');
+    if (!token) {
+      console.log('No se encontró el token de acceso. Por favor, inicia sesión primero.');
+      setErrorMessage('No se encontró el token de acceso. Por favor, inicia sesión primero.');
       return;
     }
 
-    services.createChat(accessToken).then((response)=> {
-      console.log(response);
-      
-      if(response.status === 201 && response !== undefined) {
-
-        // Crear la conexión WebSocket
-        /* const ws = new WebSocket(`ws://localhost:8000/ws/chat/?token=${accessToken}`); */
+    services.createChat(token).then((response) => {
+      if (response.status === 201 && response !== undefined) {
         const ws = new WebSocket(`ws://localhost:8000/ws/chat/${response.data.token}/`);
         
         ws.onopen = () => {
           console.log('Conexión WebSocket establecida');
-          // Enviar el token de autenticación en la cabecera
-          /* ws.send(JSON.stringify({ type: 'auth', token: response.data.token })); */
-          ws.send(JSON.stringify({  "message": "como te encuentras","sender": "usuario" }));
+          ws.send(JSON.stringify({ "message": "como te encuentras", "sender": "usuario" }));
         };
     
         ws.onmessage = (event) => {
           const data = JSON.parse(event.data);
           setMessages((prevMessages) => [...prevMessages, { role: data.sender, content: data.message }]);
+          setIsLoading(false);
         };
     
         ws.onclose = () => {
@@ -135,23 +125,24 @@ const ChatGPTClone = () => {
         };
     
         ws.onerror = (error) => {
-          console.error('Error en la conexión WebSocket:', error);
+          console.log('Error en la conexión WebSocket:', error);
+          setIsLoading(false);
         };
     
         setWebSocket(ws);
     
         return () => {
-          // Cerrar la conexión al desmontar el componente
           ws.close();
         };
       } else {
         console.log('error en la creacion del chat');
+        setIsLoading(false);
       }
-    }).catch((error)=>{
+    }).catch((error) => {
       console.log(error);
-    })
-
-  }, []);
+      setIsLoading(false);
+    });
+  }, [token]);
 
   useEffect(() => {
     const savedChatHistory = localStorage.getItem('chatHistory');
@@ -165,7 +156,9 @@ const ChatGPTClone = () => {
   }, [chatHistory]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   useEffect(() => {
@@ -173,27 +166,30 @@ const ChatGPTClone = () => {
   }, [messages]);
 
   const handleSendMessage = (message) => {
-    setMessages(prev => [...prev, { role: 'user', content: message }]);
+    setMessages(prevMessages => [...prevMessages, { role: 'user', content: message }]);
     setIsLoading(true);
 
-    // Enviar mensaje al servidor WebSocket
-    if (webSocket) {
+    if (webSocket && webSocket.readyState === WebSocket.OPEN) {
       webSocket.send(JSON.stringify({ message: message, sender: 'user' }));
+    } else {
+      console.log('WebSocket is not connected');
+      setIsLoading(false);
     }
   };
 
   const handleNewChat = () => {
     const newChatTitle = messages.length > 1 ? messages[1].content.slice(0, 30) + '...' : 'New Chat';
-    setChatHistory(prev => [...prev, { title: newChatTitle, messages: messages }]);
+    setChatHistory(prevHistory => [...prevHistory, { title: newChatTitle, messages: messages }]);
     setMessages([{ role: 'assistant', content: 'Otra cosa ve?' }]);
   };
 
   const handleDeleteChat = (index) => {
-    setChatHistory(prev => prev.filter((_, i) => i !== index));
+    setChatHistory(prevHistory => prevHistory.filter((_, i) => i !== index));
   };
 
   return (
     <div className="chat-container">
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
       <Sidebar onNewChat={handleNewChat} chatHistory={chatHistory} onDeleteChat={handleDeleteChat} />
       <div className="main-content">
         <header className="header">
