@@ -73,7 +73,8 @@ opacity: 50%;
 	outline: none;
 	border-radius: 5px;
 }
-.component-login button{
+.component-login .btn-registry,
+.component-login .btn-login {
 	width: 60%;
 	height: 40px;
 	margin: 10px auto;
@@ -90,7 +91,8 @@ opacity: 50%;
 	transition: .2s ease-in;
 	cursor: pointer;
 }
-.component-login button:hover{
+.component-login .btn-registry:hover,
+.component-login .btn-login:hover {
 	background: #1205a3;
 }
 .component-login .login{
@@ -207,4 +209,13 @@ form {
 
 .strength-bar.strong {
     background-color: green!important;
+}
+
+.btn-google {
+    text-align: center;
+	cursor: pointer;
+}
+
+.btn-google button {
+    opacity: 1 !important;
 }

@@ -58,116 +58,113 @@
 
 .event-popup {
     position: fixed;
-    top: 10%;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, 0);
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    transform: translate(-50%, -50%); /* Centra el popup en la pantalla */
+    background-color: #ffffff; /* Fondo blanco para mejor legibilidad */
+    padding: 25px 30px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    width: 350px;
+    width: 90%;
+    max-width: 500px; /* Aumenta el ancho máximo para mayor espacio */
     border-radius: 12px;
-    transition: all 0.3s ease;
-    animation: slideIn 0.4s ease-out;
-    font-family: 'Arial', sans-serif;
-    overflow: hidden;
-}
-
-/* Para agregar una animación de entrada suave */
-@keyframes slideIn {
+    font-family: 'Roboto', sans-serif; /* Fuente más moderna */
+    color: #333; /* Color de texto más oscuro para mejor contraste */
+    animation: fadeInScale 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeInScale {
     from {
-        opacity: 0;
-        transform: translate(-50%, -30%);
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.9);
     }
     to {
-        opacity: 1;
-        transform: translate(-50%, 0);
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
-}
-
-.popup-content {
+  }
+  
+  .popup-content {
     position: relative;
-}
-
-/* Mejorar el estilo del título */
-.event-popup h3 {
+  }
+  
+  .event-popup h3 {
     margin-top: 0;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #333;
-    border-bottom: 2px solid #f1f1f1;
-    padding-bottom: 10px;
-}
-
-/* Mejorar el estilo de las etiquetas */
-.event-popup p {
-    margin: 10px 0;
+    font-size: 1.8em;
+    font-weight: 500;
+    color: #222;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 15px;
+  }
+  
+  .event-popup p {
+    margin: 15px 0;
     font-size: 1em;
-    color: #666;
-}
-
-.event-popup p strong {
-    color: #333;
-    font-weight: bold;
-}
-
-/* Botón de cerrar más atractivo */
-.close-btn {
+    line-height: 1.6;
+    color: #555;
+  }
+  
+  .event-popup p strong {
+    display: inline-block;
+    width: 130px; /* Alineación uniforme de etiquetas */
+    color: #222;
+  }
+  
+  .close-btn,
+  .delete-btn,
+  .edit-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 15px;
     background-color: transparent;
     border: none;
-    color: #888;
     cursor: pointer;
-    font-size: 1.5em;
     transition: color 0.3s ease;
-}
-
-.close-btn:hover {
-    color: #333;
-}
-
-/* Mejora para dispositivos móviles */
-@media (max-width: 600px) {
+  }
+  
+  .close-btn {
+    right: 15px;
+    color: #999;
+  }
+  
+  .close-btn:hover {
+    color: #666;
+  }
+  
+  .delete-btn {
+    right: 50px;
+    color: #f44336;
+  }
+  
+  .delete-btn:hover {
+    color: #d32f2f;
+  }
+  
+  .edit-btn {
+    right: 85px;
+    color: #4caf50;
+  }
+  
+  .edit-btn:hover {
+    color: #388e3c;
+  }
+  
+  /* Mejora para dispositivos móviles */
+  @media (max-width: 600px) {
     .event-popup {
-        width: 90%;
-        top: 15%;
+      padding: 20px;
+      width: 95%;
     }
-}
-
-.popup-content {
-    position: relative;
-}
-
-.popup-content h3 {
-    margin-top: 0;
-    text-align: center;
-}
-
-.popup-content img {
-    margin-top: 10px;
-    border-radius: 4px;
-}
-
-.popup-content p {
-    margin: 10px 0;
-}
-
-.event-popup button {
-    display: block;
-    margin: 20px auto 0;
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.event-popup button:hover {
-    background-color: #0056b3;
-}
+  
+    .event-popup h3 {
+      font-size: 1.5em;
+    }
+  
+    .event-popup p strong {
+      width: 100%;
+    }
+  }
 
 /* Opcional: Estilos para el popup de creación de evento */
 .MuiDialogTitle-root {
@@ -196,3 +193,22 @@
     background-color: #41916c;
     border: 10px solid black;
 }
+
+/* src/components/component-register-event/RegisterEvent.css */
+
+.container-calendar-events {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* ... otros estilos ... */
+  
+  .delete-btn {
+    color: #f44336; /* Rojo para indicar acción de eliminar */
+  }
+  
+  .delete-btn:hover {
+    color: #d32f2f;
+  }

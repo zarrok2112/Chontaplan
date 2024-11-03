@@ -1,139 +1,217 @@
 import React, { useState } from 'react';
 import './login.css';
+import './login.css';
 import services from '../../services/services';
 import { useNavigate } from 'react-router-dom';
 import Progress from '../component-progress/Progress';
 import { useDispatch } from 'react-redux';
 import { showAlert } from '../../store/reducerAlert/alertSlice';
 import { getToken } from '../../store/reducerToken/tokenSlice';
+import { isActive } from '../../store/reducerSession/sessionSlice';
+import { GoogleLogin } from 'react-google-login';
+import { gapi } from 'gapi-script';
+
+const CLIENT_ID = 'ANDRESAQUIVATUID.apps.googleusercontent.com';
 
 
 const Login = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-	const navigate = useNavigate();
-
-	const [isValidatePassword, setValidatePassword] = useState('');
-	const [isConfirmPassword, setIsConfirmPassword] = useState('');
-	const [messageError, setMessageError] = useState('');
-	const [validateEmail, setValidateEmail] = useState('');
-	const [errorValidateEmail, setErrorValidateEmail] = useState(true);
-	const [progress,setProgress] = useState(false);
-	const dispatch = useDispatch();
+    const [isValidatePassword, setValidatePassword] = useState('');
+    const [isConfirmPassword, setIsConfirmPassword] = useState('');
+    const [messageError, setMessageError] = useState('');
+    const [validateEmail, setValidateEmail] = useState('');
+    const [errorValidateEmail, setErrorValidateEmail] = useState(true);
+    const [progress, setProgress] = useState(false);
 
 
 	var contador = 0 ;
 
-	const onclickLogin = (e) => {
-		e.preventDefault();
-
-		const user = e.target.email.value;
-		const pass = e.target.pswd.value;
-		const formData = new URLSearchParams();
-		formData.append('email', user);
-		formData.append('password',pass);
-
-		setProgress(true);
-		services.loginService(formData).then(response => {
-			setProgress(false);
-			if(response.status === 200) {
-				console.log("se logio exitosamente");
-				dispatch(getToken({value:response.data.access}));
-				dispatch(showAlert({ type: 'success', message: 'Se logio exitosamente!' }));
-				navigate('/home');
-			} else {
-				console.log("error else");
-			}
-		}).catch((error) => {
-			setProgress(false);
-			dispatch(showAlert({ type: 'error', message: 'Error al loguearse' }));
-			console.log("error login "+error);
-		});
-
-		e.target.email.value = '';
-		e.target.pswd.value = '';
-	}
-    
-	const registrarUsuario = (e) => {
-		e.preventDefault();
-		const nombre = e.target.name.value;
-		const correo = e.target.email.value;
-		const contra = e.target.pass.value;
-
-		let data = {
-			"user_info":{
-				"name": nombre,
-				"email": correo,
-				"password": contra,
-				"role":0
-			}
-		}
-		
-		
-		setProgress(true);
-		services.signUp(data).then(response => {
-			setProgress(false);
-			if(response.status === 201) {
-				dispatch(showAlert({ type: 'success', message: 'Se registro exitosamente!' }));
-				console.log(response.data.message);
-			} else {
-				console.log(response.data[0].errorMessage);
-			}
-		}).catch((error)=>{
-			setProgress(false);
-			dispatch(showAlert({ type: 'error', message: 'Error al registrarse' }));
-			console.log("error signUp "+error);
-		});
-		
-		e.target.name.value = '';
-		e.target.email.value = '';
-		e.target.pass.value = '';
-		e.target.passTwo.value = '';
-
-	}
-
-	const validatePass = (pass, confir) => {
-		const  tieneOchoCaracteres = pass.length >= 8; // Filtrar solo los números
-		const tieneMayuscula = /[A-Z]/.test(pass); // Verificar mayúsculas
-		const tieneMinuscula = /[a-z]/.test(pass); // Verificar minúsculas
-		const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(pass); // Verificar caracteres especiales
-
-		if(tieneMinuscula || tieneMayuscula) {
-			contador = 1 ; 
-			
-		}
-		if (tieneMayuscula && tieneMinuscula ) {
-			contador = 2 ; 
-		} 
-		if(tieneOchoCaracteres && tieneMayuscula && tieneMinuscula) {
-			contador = 3 ; 
-		} 
-		if(tieneOchoCaracteres && tieneMayuscula && tieneMinuscula && tieneEspecial) {
-			contador = 4 ; 
-			
-		} 
-		
-
-		if (contador !== 0) {
-			
-			progressPassword(contador);
-
-			
-
-		}
-		
-		if(pass === confir) {
-			setMessageError("");
-		} else {
-			setMessageError("La contraseña no coincide.");
-		}
-		
-		if(pass === '') {
-			progressPassword(0);
-		}
+	const onSuccess = (response) => {
+		dispatch(isActive({isActive: true,infoUser:response.profileObj}));
 	};
 
-	const progressPassword = (strength) => {
-		const bar = document.getElementsByClassName('strength-bar');
+	const onFailure = (response) => {
+		var msgError = 'Error en el inicio de sesión:', response;
+		dispatch(showAlert({ type: 'error', message: msgError }));
+	};
+
+	const initializeGAPI = () => {
+		gapi.client.init({
+		  apiKey: 'ANDRESAQUIVAELAPIKEY',
+		  clientId: CLIENT_ID,
+		  discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'],
+		  scope: 'https://www.googleapis.com/auth/calendar',
+		}).then(() => {
+		  console.log('GAPI initialized');
+		});
+	};
+
+	const listEvents = () => {
+	gapi.client.calendar.events.list({
+		'calendarId': 'primary',
+		'timeMin': (new Date()).toISOString(),
+		'maxResults': 10,
+		'singleEvents': true,
+		'orderBy': 'startTime',
+	}).then((response) => {
+		const events = response.result.items;
+		if (events.length > 0) {
+		console.log('Próximos eventos:', events);
+		} else {
+		console.log('No hay eventos próximos.');
+		}
+	});
+	};
+
+	const addEvent = () => {
+		const event = {
+			summary: 'Nuevo Evento',
+			location: 'Ubicación',
+			description: 'Descripción del evento',
+			start: {
+			dateTime: '2024-10-20T09:00:00-07:00',
+			timeZone: 'America/Los_Angeles',
+			},
+			end: {
+			dateTime: '2024-10-20T10:00:00-07:00',
+			timeZone: 'America/Los_Angeles',
+			},
+		};
+
+		gapi.client.calendar.events.insert({
+			calendarId: 'primary',
+			resource: event,
+		}).then((response) => {
+			console.log('Evento creado:', response.result.htmlLink);
+		});
+	};
+	
+
+    const onclickLogin = (e) => {
+        e.preventDefault();
+
+        const user = e.target.email.value;
+        const pass = e.target.pswd.value;
+        const formData = new URLSearchParams();
+        formData.append('email', user);
+        formData.append('password', pass);
+
+        setProgress(true);
+        services.loginService(formData).then(response => {
+            setProgress(false);
+            if (response.status === 200) {
+                console.log("se logio exitosamente");
+                dispatch(getToken({ value: response.data.access }));
+                dispatch(showAlert({ type: 'success', message: 'Se logio exitosamente!' }));
+                navigate('/home');
+            } else {
+                console.log("error else");
+            }
+        }).catch((error) => {
+            setProgress(false);
+            dispatch(showAlert({ type: 'error', message: 'Error al loguearse' }));
+            console.log("error login " + error);
+        });
+
+        e.target.email.value = '';
+        e.target.pswd.value = '';
+    }
+
+    const registrarUsuario = (e) => {
+        e.preventDefault();
+        const nombre = e.target.name.value;
+        const correo = e.target.email.value;
+        const contra = e.target.pass.value;
+        const confirmarContra = e.target.passTwo.value;
+
+        if (!errorValidateEmail) {
+            setMessageError("Por favor, use un correo electrónico educativo válido.");
+            return;
+        }
+
+        if (contra !== confirmarContra) {
+            setMessageError("Las contraseñas no coinciden. Por favor, inténtelo de nuevo.");
+            return;
+        }
+
+        if (messageError) {
+            setMessageError("Por favor, corrija los errores antes de registrarse.");
+            return;
+        }
+
+        let data = {
+            "user_info": {
+                "name": nombre,
+                "email": correo,
+                "password": contra,
+                "role": 0
+            }
+        }
+
+        setProgress(true);
+        services.signUp(data).then(response => {
+            setProgress(false);
+            if (response.status === 201) {
+                dispatch(showAlert({ type: 'success', message: 'Se registró exitosamente!' }));
+                console.log(response.data.message);
+                // Clear form fields after successful registration
+                e.target.name.value = '';
+                e.target.email.value = '';
+                e.target.pass.value = '';
+                e.target.passTwo.value = '';
+                setValidatePassword('');
+                setIsConfirmPassword('');
+                setValidateEmail('');
+                setMessageError('');
+            } else {
+                setMessageError(response.data[0].errorMessage || "Error en el registro");
+            }
+        }).catch((error) => {
+            setProgress(false);
+            dispatch(showAlert({ type: 'error', message: 'Error al registrarse' }));
+            setMessageError("Error al registrarse. Por favor, inténtelo de nuevo.");
+            console.log("error signUp " + error);
+        });
+    }
+
+    const validatePass = (pass, confir) => {
+        const tieneOchoCaracteres = pass.length >= 8;
+        const tieneMayuscula = /[A-Z]/.test(pass);
+        const tieneMinuscula = /[a-z]/.test(pass);
+        const tieneEspecial = /[!@#$%^&*(),.?":{}|<>]/.test(pass);
+
+        if (tieneMinuscula || tieneMayuscula) {
+            contador = 1;
+        }
+        if (tieneMayuscula && tieneMinuscula) {
+            contador = 2;
+        }
+        if (tieneOchoCaracteres && tieneMayuscula && tieneMinuscula) {
+            contador = 3;
+        }
+        if (tieneOchoCaracteres && tieneMayuscula && tieneMinuscula && tieneEspecial) {
+            contador = 4;
+        }
+
+        if (contador !== 0) {
+            progressPassword(contador);
+        }
+
+        if (pass === confir) {
+            setMessageError("");
+        } else {
+            setMessageError("La contraseña no coincide.");
+        }
+
+        if (pass === '') {
+            progressPassword(0);
+        }
+    };
+
+    const progressPassword = (strength) => {
+        const bar = document.getElementsByClassName('strength-bar');
         let barColorClass = 'strength-bar';
 
         for (var i = 0; i < bar.length; i++) {
@@ -168,60 +246,60 @@ const Login = () => {
 
     return (
         <div className="component-login">
-			{progress ? <Progress />:<></>}
-            <div class="mirave">
-				Cali es Cali
-				<br />
-				<span>lo demás es loma </span>
-			</div>
+            {progress ? <Progress /> : <></>}
+            <div className="mirave">
+                Cali es Cali
+                <br />
+                <span>lo demás es loma </span>
+            </div>
 
-			<div class="main">  	
-				<input type="checkbox" id="chk" aria-hidden="true" />
+            <div className="main">
+                <input type="checkbox" id="chk" aria-hidden="true" />
 
-					<div class="signup">
-						<form onSubmit={registrarUsuario}>
-							<label htmlFor="chk" aria-hidden="true">Registro</label>
-							<input 
-								type="text" 
-								name="txt" 
-								id="name"
-								placeholder="Full name (Registro)" 
-								required="" 
-							/>
-							<input 
-								type="email" 
-								name="email" 
-								id="email"
-								placeholder="Email (Registro)" 
-								required=""
-								value={validateEmail}
-								onChange={(e) => {
-									setValidateEmail(e.target.value);
-									validateCorreoEdu(e.target.value);
-								}}
-							/>
-							{errorValidateEmail === false ? <p style={{color:'white'}}>{"El correo no es edu"}</p>:''}
-							<input 
-								type="password" 
-								name="pass"
-								id="pass"
-								placeholder="Password (Registro)" 
-								required=""
-								value = {isValidatePassword}
-								onChange={(e)=>{
-									setValidatePassword(e.target.value)
-									validatePass(e.target.value,isConfirmPassword);
-								}} 
-							/>
-							<div class="password-strength">
-								<span>Seguridad de la contraseña</span>
-								<div class="strength-meter">
-									<div class="strength-bar"></div>
-									<div class="strength-bar"></div>
-									<div class="strength-bar"></div>
-									<div class="strength-bar"></div>
-								</div>
-							</div>
+                <div className="signup">
+                    <form onSubmit={registrarUsuario}>
+                        <label htmlFor="chk" aria-hidden="true">Registro</label>
+                        <input
+                            type="text"
+                            name="txt"
+                            id="name"
+                            placeholder="Full name (Registro)"
+                            required=""
+                        />
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            placeholder="Email (Registro)"
+                            required=""
+                            value={validateEmail}
+                            onChange={(e) => {
+                                setValidateEmail(e.target.value);
+                                validateCorreoEdu(e.target.value);
+                            }}
+                        />
+                        {errorValidateEmail === false ? <p style={{ color: 'white' }}>{"El correo no es edu"}</p> : ''}
+                        <input
+                            type="password"
+                            name="pass"
+                            id="pass"
+                            placeholder="Password (Registro)"
+                            required=""
+                            value={isValidatePassword}
+                            onChange={(e) => {
+                                setValidatePassword(e.target.value)
+                                validatePass(e.target.value, isConfirmPassword);
+                            }}
+                        />
+                        <div className="password-strength">
+                            <span>Seguridad de la contraseña</span>
+                            <div className="strength-meter">
+                                <div className="strength-bar"></div>
+                                <div className="strength-bar"></div>
+                                <div className="strength-bar"></div>
+                                <div className="strength-bar"></div>
+                            </div>
+                        </div>
 
 							<input 
 								type="password"
@@ -236,7 +314,7 @@ const Login = () => {
 								}}
 							/>
 							{messageError && <p style={{color:'white'}}>{messageError}</p>}
-							<button type="submit" id="joinus">Registrar</button>
+							<button className="btn-registry" type="submit" id="joinus">Registrar</button>
 						</form>
 					</div>
 			
@@ -247,8 +325,17 @@ const Login = () => {
 							<input type="email" name="email" id="email" placeholder="Email" required="" />
 							<input type="password" name="pswd" id="pass" placeholder="Password (Inicio de sesión)" required="" />
 
-							<button type="submit" id="disparo">Iniciar</button>
+							<button className="btn-login" type="submit" id="disparo">Iniciar</button>
 						</form>
+						<div className='btn-google'>
+							<GoogleLogin
+								clientId={CLIENT_ID}
+								buttonText="Iniciar sesión con Google"
+								onSuccess={onSuccess}
+								onFailure={onFailure}
+								cookiePolicy={'single_host_origin'}
+							/>
+						</div>
 					</div>
 			
 			</div>
