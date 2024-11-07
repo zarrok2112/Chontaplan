@@ -1,4 +1,4 @@
-// src/test/Login.test.js
+// Login.test.js
 
 import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
@@ -20,6 +20,13 @@ jest.mock('../services/services', () => ({
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
   useDispatch: jest.fn(),
+}));
+
+// Mock de useNavigate de react-router-dom
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
 }));
 
 describe('Componente Login', () => {
@@ -69,7 +76,7 @@ describe('Componente Login', () => {
     // Simular envío del formulario
     fireEvent.click(within(loginForm).getByText('Iniciar'));
 
-    // Esperar a que se llame a dispatch
+    // Esperar a que se llame a dispatch con getToken
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
         getToken({ value: 'fake_jwt_token' })
@@ -79,9 +86,12 @@ describe('Componente Login', () => {
     // Verificar que se mostró una alerta de éxito
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
-        showAlert({ type: 'success', message: 'Se logio exitosamente!' })
+        showAlert({ type: 'success', message: 'Se logueó exitosamente!' })
       );
     });
+
+    // Verificar que se navegó a '/home'
+    expect(mockNavigate).toHaveBeenCalledWith('/home');
   });
 
   test('muestra mensaje de error cuando el inicio de sesión falla', async () => {
@@ -116,6 +126,9 @@ describe('Componente Login', () => {
         showAlert({ type: 'error', message: 'Error al loguearse' })
       );
     });
+
+    // Verificar que no se navegue a '/home'
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   test('renderiza el formulario de registro y permite al usuario registrarse', async () => {
@@ -126,13 +139,13 @@ describe('Componente Login', () => {
         </Provider>
       </MemoryRouter>
     );
-  
+
     // Cambiar al formulario de registro
     fireEvent.click(screen.getByLabelText(/Registro/i));
-  
+
     // Obtener el formulario de registro
     const registerForm = screen.getByTestId('register-form');
-  
+
     // Simular entrada de datos con un correo válido
     fireEvent.change(within(registerForm).getByPlaceholderText('Full name (Registro)'), {
       target: { value: 'John Doe' },
@@ -146,7 +159,7 @@ describe('Componente Login', () => {
     fireEvent.change(within(registerForm).getByPlaceholderText('Repeat (Registro)'), {
       target: { value: 'SecurePassword123!' },
     });
-  
+
     // Mock del servicio de registro para devolver una respuesta exitosa
     services.signUp.mockResolvedValueOnce({
       status: 201,
@@ -154,22 +167,25 @@ describe('Componente Login', () => {
         message: 'Registro exitoso',
       },
     });
-  
+
     // Simular envío del formulario
     fireEvent.click(within(registerForm).getByText('Registrar'));
-  
+
     // Esperar a que se llame a dispatch con el mensaje de éxito
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
         showAlert({ type: 'success', message: 'Se registró exitosamente!' })
       );
     });
+
+    // Verificar que no se navegue a '/home' después del registro
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   test('muestra mensaje de error cuando el registro falla', async () => {
     // Mock del servicio de registro para rechazar la promesa
     services.signUp.mockRejectedValueOnce(new Error('Error al registrarse'));
-  
+
     render(
       <MemoryRouter>
         <Provider store={store}>
@@ -177,13 +193,13 @@ describe('Componente Login', () => {
         </Provider>
       </MemoryRouter>
     );
-  
+
     // Cambiar al formulario de registro
     fireEvent.click(screen.getByLabelText(/Registro/i));
-  
+
     // Obtener el formulario de registro
     const registerForm = screen.getByTestId('register-form');
-  
+
     // Simular entrada de datos con un correo válido
     fireEvent.change(within(registerForm).getByPlaceholderText('Full name (Registro)'), {
       target: { value: 'John Doe' },
@@ -197,15 +213,18 @@ describe('Componente Login', () => {
     fireEvent.change(within(registerForm).getByPlaceholderText('Repeat (Registro)'), {
       target: { value: 'SecurePassword123!' },
     });
-  
+
     // Simular envío del formulario
     fireEvent.click(within(registerForm).getByText('Registrar'));
-  
+
     // Esperar a que se llame a dispatch con el mensaje de error
     await waitFor(() => {
       expect(mockDispatch).toHaveBeenCalledWith(
         showAlert({ type: 'error', message: 'Error al registrarse' })
       );
     });
+
+    // Verificar que no se navegue a '/home'
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 });
