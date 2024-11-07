@@ -83,41 +83,41 @@ const Login = () => {
     dispatch(showAlert({ type: 'error', message: 'Error en el inicio de sesión con Google' }));
   };
 
-  const onclickLogin = (e) => {
+  const onclickLogin = async (e) => {
     e.preventDefault();
-    const user = e.target.email.value;
-    const pass = e.target.pswd.value;
+    const correo = e.target.elements['email'].value;
+    const contra = e.target.elements['pswd'].value;
+
     const formData = new URLSearchParams();
-    formData.append('email', user);
-    formData.append('password', pass);
+    formData.append('email', correo);
+    formData.append('password', contra);
 
     setProgress(true);
-    services.loginService(formData).then(response => {
+    try {
+      const response = await services.loginService(formData);
       setProgress(false);
       if (response.status === 200) {
-        console.log("se logio exitosamente");
         dispatch(getToken({ value: response.data.access }));
-        dispatch(showAlert({ type: 'success', message: 'Se logio exitosamente!' }));
+        dispatch(showAlert({ type: 'success', message: 'Se logueó exitosamente!' }));
         navigate('/home');
       } else {
-        console.log("error else");
+        dispatch(showAlert({ type: 'error', message: 'Error al loguearse' }));
       }
-    }).catch((error) => {
+    } catch (error) {
       setProgress(false);
       dispatch(showAlert({ type: 'error', message: 'Error al loguearse' }));
-      console.log("error login " + error);
-    });
+      console.error("Error en el login:", error);
+    }
 
-    e.target.email.value = '';
-    e.target.pswd.value = '';
-  }
+    e.target.reset();
+  };
 
-  const registrarUsuario = (e) => {
+  const registrarUsuario = async (e) => {
     e.preventDefault();
-    const nombre = e.target.name.value;
-    const correo = e.target.email.value;
-    const contra = e.target.pass.value;
-    const confirmarContra = e.target.passTwo.value;
+    const nombre = e.target.elements['name'].value;
+    const correo = e.target.elements['email'].value;
+    const contra = e.target.elements['pass'].value;
+    const confirmarContra = e.target.elements['passTwo'].value;
 
     if (!errorValidateEmail) {
       setMessageError("Por favor, use un correo electrónico educativo válido.");
@@ -134,39 +134,36 @@ const Login = () => {
       return;
     }
 
-    let data = {
+    const data = {
       "user_info": {
         "name": nombre,
         "email": correo,
         "password": contra,
         "role": 0
       }
-    }
+    };
 
     setProgress(true);
-    services.signUp(data).then(response => {
+    try {
+      const response = await services.signUp(data);
       setProgress(false);
       if (response.status === 201) {
         dispatch(showAlert({ type: 'success', message: 'Se registró exitosamente!' }));
-        console.log(response.data.message);
-        e.target.name.value = '';
-        e.target.email.value = '';
-        e.target.pass.value = '';
-        e.target.passTwo.value = '';
+        e.target.reset();
         setValidatePassword('');
         setIsConfirmPassword('');
         setValidateEmail('');
         setMessageError('');
       } else {
-        setMessageError(response.data[0].errorMessage || "Error en el registro");
+        setMessageError(response.data[0]?.errorMessage || "Error en el registro");
       }
-    }).catch((error) => {
+    } catch (error) {
       setProgress(false);
       dispatch(showAlert({ type: 'error', message: 'Error al registrarse' }));
       setMessageError("Error al registrarse. Por favor, inténtelo de nuevo.");
-      console.log("error signUp " + error);
-    });
-  }
+      console.error("Error en el registro:", error);
+    }
+  };
 
   const validatePass = (pass, confir) => {
     let contador = 0;
@@ -180,14 +177,12 @@ const Login = () => {
     if (tieneOchoCaracteres && tieneMayuscula && tieneMinuscula) contador = 3;
     if (tieneOchoCaracteres && tieneMayuscula && tieneMinuscula && tieneEspecial) contador = 4;
 
-    if (contador !== 0) {
-      progressPassword(contador);
-    }
+    progressPassword(contador);
 
     if (pass === confir) {
       setMessageError("");
     } else {
-      setMessageError("La contraseña no coincide.");
+      setMessageError("Las contraseñas no coinciden.");
     }
 
     if (pass === '') {
@@ -223,7 +218,7 @@ const Login = () => {
     if (email === '') {
       setErrorValidateEmail(true);
     } else {
-      const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]*edu[a-zA-Z0-9.-]*$/;
+      const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]*\.edu(\.[a-zA-Z]{2})?$/;
       setErrorValidateEmail(regex.test(email));
     }
   };
@@ -248,12 +243,12 @@ const Login = () => {
           <div className="main">
             <input type="checkbox" id="chk" aria-hidden="true" />
 
-            <div className="signup">
+            <div className="signup" data-testid="register-form">
               <form onSubmit={registrarUsuario}>
                 <label htmlFor="chk" aria-hidden="true">Registro</label>
                 <input
                   type="text"
-                  name="txt"
+                  name="name" // Cambiado de "txt" a "name"
                   id="name"
                   placeholder="Full name (Registro)"
                   required
@@ -293,24 +288,24 @@ const Login = () => {
                   </div>
                 </div>
 
-                <input 
+                <input
                   type="password"
-                  name="passTwo" 
+                  name="passTwo"
                   id="passTwo"
-                  placeholder="Repeat (Registro)" 
+                  placeholder="Repeat (Registro)"
                   required
                   value={isConfirmPassword}
-                  onChange={(e)=>{
+                  onChange={(e) => {
                     setIsConfirmPassword(e.target.value);
-                    validatePass(isValidatePassword,e.target.value);
+                    validatePass(isValidatePassword, e.target.value);
                   }}
                 />
-                {messageError && <p style={{color:'white'}}>{messageError}</p>}
+                {messageError && <p style={{ color: 'white' }}>{messageError}</p>}
                 <button className="btn-registry" type="submit" id="joinus">Registrar</button>
               </form>
             </div>
-      
-            <div className="login">
+
+            <div className="login" data-testid="login-form">
               <label htmlFor="chk" aria-hidden="true">Inicio</label>
               <form onSubmit={onclickLogin}>
                 <input type="email" name="email" id="email" placeholder="Email" required />
