@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-
+from .data import USER_ROLE_CHOICES
 from .models import User
 from .serializers import (
     UserSerializer,
@@ -109,3 +109,9 @@ class ActivateAccountView(APIView):
         else:
             return Response({'message': 'Token inválido o expirado.'}, status=status.HTTP_400_BAD_REQUEST)
 
+class UserRoleChoicesView(APIView):
+    def get(self, request, *args, **kwargs):
+        roles_dict = {name: idx  for idx, (code, name) in enumerate(USER_ROLE_CHOICES)}
+
+        filtered_data = {k: v for k, v in roles_dict.items() if v != 0}
+        return Response(filtered_data, status=status.HTTP_200_OK)
