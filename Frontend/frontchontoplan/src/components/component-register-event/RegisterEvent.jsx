@@ -1,29 +1,19 @@
+// src/components/component-register-event/RegisterEvent.jsx
+
 import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import "./RegisterEvent.css";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import { IconButton } from "@mui/material";
+import {
+  Box,Grid,List,ListItem,ListItemText,Button,Dialog,DialogTitle,DialogContent,DialogActions,TextField,Select,MenuItem,InputLabel,FormControl,IconButton,Typography,Paper,Stack,} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit"; // Importar EditIcon
+import EditIcon from "@mui/icons-material/Edit";
 import services from "../../services/services";
 import Progress from "../component-progress/Progress";
 import { useDispatch, useSelector } from "react-redux";
 import { showAlert } from "../../store/reducerAlert/alertSlice";
+import chontadurin from '../../assets/chontadurin.png';
 
 moment.locale("es");
 const localizer = momentLocalizer(moment);
@@ -70,8 +60,8 @@ const RegisterEvent = () => {
     description: "",
     briefDescription: "",
   });
-  const [showEditDialog, setShowEditDialog] = useState(false); // Nuevo estado
-  const [editEvent, setEditEvent] = useState(null); // Nuevo estado
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editEvent, setEditEvent] = useState(null);
   const token = useSelector((state) => state.token.value);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [progress, setProgress] = useState(false);
@@ -82,17 +72,25 @@ const RegisterEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
 
   useEffect(() => {
-    services
-      .getEvents(token)
-      .then((response) => {
-        if (response.status === 200) {
-          setEvents(response.data);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    fetchEvents();
   }, [token]);
+
+  const fetchEvents = async () => {
+    try {
+      const response = await services.getEvents(token);
+      if (response.status === 200) {
+        setEvents(response.data);
+      }
+    } catch (error) {
+      console.error("Error al obtener los eventos:", error);
+      dispatch(
+        showAlert({
+          type: "error",
+          message: "No se pudieron obtener los eventos.",
+        })
+      );
+    }
+  };
 
   const handleSelectSlot = ({ start, end }) => {
     setNewEvent({
@@ -146,10 +144,15 @@ const RegisterEvent = () => {
     });
   };
 
-  const handleCreateEvent = () => {
+  const handleCreateEvent = async () => {
     // Validar campos requeridos
     if (!newEvent.title || !newEvent.type || !newEvent.start || !newEvent.end) {
-      alert("Por favor completa todos los campos requeridos.");
+      dispatch(
+        showAlert({
+          type: "error",
+          message: "Por favor, completa todos los campos requeridos.",
+        })
+      );
       return;
     }
 
@@ -167,41 +170,30 @@ const RegisterEvent = () => {
       location: newEvent.location,
     };
 
-    services
-      .registerEvent(token, dataEvent)
-      .then((response) => {
-        setProgress(false);
-        if (response.status === 201) {
-          dispatch(
-            showAlert({
-              type: "success",
-              message: "El evento se creó exitosamente!",
-            })
-          );
-          setShowCreateDialog(false);
-          // Actualiza la lista de eventos
-          setEvents([...events, response.data]);
-        }
-      })
-      .catch((error) => {
-        setProgress(false);
+    try {
+      const response = await services.registerEvent(token, dataEvent);
+      setProgress(false);
+      if (response.status === 201) {
         dispatch(
           showAlert({
-            type: "error",
-            message: "El evento no se creó exitosamente!",
+            type: "success",
+            message: "El evento se creó exitosamente!",
           })
         );
-        console.error("Error al crear el evento:", error.response.data);
-        if (error.response && error.response.data) {
-          console.error(
-            "Detalles del error:",
-            JSON.stringify(error.response.data, null, 2)
-          );
-        } else {
-          console.error("Error desconocido:", error);
-        }
-        return;
-      });
+        setShowCreateDialog(false);
+        // Actualiza la lista de eventos
+        setEvents([...events, response.data]);
+      }
+    } catch (error) {
+      setProgress(false);
+      dispatch(
+        showAlert({
+          type: "error",
+          message: "El evento no se creó exitosamente!",
+        })
+      );
+      console.error("Error al crear el evento:", error.response?.data || error);
+    }
   };
 
   const handleEventClick = (event) => {
@@ -223,35 +215,33 @@ const RegisterEvent = () => {
     setShowCreateDialog(false);
   };
 
-  const handleDeleteEvent = () => {
+  const handleDeleteEvent = async () => {
     if (window.confirm("¿Estás seguro de que deseas eliminar este evento?")) {
       setProgress(true);
-      services
-        .deleteEvent(token, selectedEvent.id)
-        .then((response) => {
-          setProgress(false);
-          if (response.status === 204) {
-            dispatch(
-              showAlert({
-                type: "success",
-                message: "El evento se eliminó exitosamente!",
-              })
-            );
-            // Actualiza la lista de eventos
-            setEvents(events.filter((event) => event.id !== selectedEvent.id));
-            handleClosePopup();
-          }
-        })
-        .catch((error) => {
-          setProgress(false);
+      try {
+        const response = await services.deleteEvent(token, selectedEvent.id);
+        setProgress(false);
+        if (response.status === 204) {
           dispatch(
             showAlert({
-              type: "error",
-              message: "El evento no se pudo eliminar.",
+              type: "success",
+              message: "El evento se eliminó exitosamente!",
             })
           );
-          console.error("Error al eliminar el evento:", error);
-        });
+          // Actualiza la lista de eventos
+          setEvents(events.filter((event) => event.id !== selectedEvent.id));
+          handleClosePopup();
+        }
+      } catch (error) {
+        setProgress(false);
+        dispatch(
+          showAlert({
+            type: "error",
+            message: "El evento no se pudo eliminar.",
+          })
+        );
+        console.error("Error al eliminar el evento:", error);
+      }
     }
   };
 
@@ -285,10 +275,20 @@ const RegisterEvent = () => {
     });
   };
 
-  const handleUpdateEvent = () => {
+  const handleUpdateEvent = async () => {
     // Validar campos requeridos
-    if (!editEvent.title || !editEvent.type || !editEvent.start || !editEvent.end) {
-      alert("Por favor completa todos los campos requeridos.");
+    if (
+      !editEvent.title ||
+      !editEvent.type ||
+      !editEvent.start ||
+      !editEvent.end
+    ) {
+      dispatch(
+        showAlert({
+          type: "error",
+          message: "Por favor, completa todos los campos requeridos.",
+        })
+      );
       return;
     }
 
@@ -306,36 +306,38 @@ const RegisterEvent = () => {
       location: editEvent.location,
     };
 
-    services
-      .updateEvent(token, editEvent.id, dataEvent)
-      .then((response) => {
-        setProgress(false);
-        if (response.status === 200) {
-          dispatch(
-            showAlert({
-              type: "success",
-              message: "El evento se actualizó exitosamente!",
-            })
-          );
-          setShowEditDialog(false);
-          // Actualiza la lista de eventos
-          setEvents(
-            events.map((event) =>
-              event.id === editEvent.id ? response.data : event
-            )
-          );
-        }
-      })
-      .catch((error) => {
-        setProgress(false);
+    try {
+      const response = await services.updateEvent(
+        token,
+        editEvent.id,
+        dataEvent
+      );
+      setProgress(false);
+      if (response.status === 200) {
         dispatch(
           showAlert({
-            type: "error",
-            message: "El evento no se pudo actualizar.",
+            type: "success",
+            message: "El evento se actualizó exitosamente!",
           })
         );
-        console.error("Error al actualizar el evento:", error);
-      });
+        setShowEditDialog(false);
+        // Actualiza la lista de eventos
+        setEvents(
+          events.map((event) =>
+            event.id === editEvent.id ? response.data : event
+          )
+        );
+      }
+    } catch (error) {
+      setProgress(false);
+      dispatch(
+        showAlert({
+          type: "error",
+          message: "El evento no se pudo actualizar.",
+        })
+      );
+      console.error("Error al actualizar el evento:", error);
+    }
   };
 
   // Filtrar eventos según la categoría seleccionada
@@ -356,47 +358,67 @@ const RegisterEvent = () => {
     .slice(0, 3);
 
   return (
-    <div className="container-calendar-events">
+    <Box className="container-calendar-events" sx={{ p: 3 }}>
       {progress && <Progress />}
-      {/* Encabezado */}
-      <div className="container-top">
-        <div className="container-calendar">Calendario Chontaplan</div>
-      </div>
+      {/* Encabezado Mejorado */}
+      <Box className="container-top" sx={{ textAlign: "center", mb: 4 }}>
+        <Grid container spacing={2} alignItems="center" justifyContent="center">
+          <Grid item>
+            <img src={chontadurin} alt="Logo Chontaplan" style={{ width: '60px', height: '60px' }} />
+          </Grid>
+          <Grid item>
+            <Typography variant="h4" component="h1" gutterBottom sx={{ fontFamily: 'Pacifico, cursive', color: '#2D6A4F' }}>
+              Calendario Chontaplan
+            </Typography>
+          </Grid>
+        </Grid>
+      </Box>
+
 
       {/* Menú de categorías */}
-      <div className="category-menu" style={{ marginBottom: "20px" }}>
-        <Button
-          variant={selectedCategory === "Todos" ? "contained" : "outlined"}
-          onClick={() => setSelectedCategory("Todos")}
-          style={{ marginRight: "10px" }}
-        >
-          Todos
-        </Button>
-        <Button
-          variant={selectedCategory === "Académico" ? "contained" : "outlined"}
-          onClick={() => setSelectedCategory("Académico")}
-          style={{ marginRight: "10px" }}
-        >
-          Académico
-        </Button>
-        <Button
-          variant={selectedCategory === "Artístico" ? "contained" : "outlined"}
-          onClick={() => setSelectedCategory("Artístico")}
-          style={{ marginRight: "10px" }}
-        >
-          Artístico
-        </Button>
-        <Button
-          variant={selectedCategory === "Deportivo" ? "contained" : "outlined"}
-          onClick={() => setSelectedCategory("Deportivo")}
-          style={{ marginRight: "10px" }}
-        >
-          Deportivo
-        </Button>
-      </div>
+      <Box
+        className="category-menu"
+        sx={{ display: "flex", justifyContent: "center", mb: 4 }}
+      >
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant={selectedCategory === "Todos" ? "contained" : "outlined"}
+            onClick={() => setSelectedCategory("Todos")}
+          >
+            Todos
+          </Button>
+          <Button
+            variant={
+              selectedCategory === "Académico" ? "contained" : "outlined"
+            }
+            onClick={() => setSelectedCategory("Académico")}
+          >
+            Académico
+          </Button>
+          <Button
+            variant={
+              selectedCategory === "Artístico" ? "contained" : "outlined"
+            }
+            onClick={() => setSelectedCategory("Artístico")}
+          >
+            Artístico
+          </Button>
+          <Button
+            variant={
+              selectedCategory === "Deportivo" ? "contained" : "outlined"
+            }
+            onClick={() => setSelectedCategory("Deportivo")}
+          >
+            Deportivo
+          </Button>
+        </Stack>
+      </Box>
 
       {/* Botón para crear un nuevo evento */}
-      <div className="event-creation-section">
+      <Box
+        className="event-creation-section"
+        sx={{ display: "flex", justifyContent: "center", mb: 4 }}
+      >
         <Button
           variant="contained"
           color="primary"
@@ -404,107 +426,121 @@ const RegisterEvent = () => {
         >
           Crear nuevo evento
         </Button>
-      </div>
+      </Box>
 
-      {/* Calendario */}
-      <div className="calendar-container">
-        <Calendar
-          localizer={localizer}
-          events={filteredEvents}
-          startAccessor={(event) => new Date(event.event_start_datetime)}
-          endAccessor={(event) => new Date(event.event_end_datetime)}
-          style={{ height: 500 }}
-          messages={messages}
-          onSelectSlot={handleSelectSlot}
-          selectable
-          onSelectEvent={handleEventClick}
-          components={{
-            event: CustomEvent,
-          }}
-          views={["month", "day", "agenda"]}
-          date={currentDate}
-          onNavigate={(date) => setCurrentDate(date)}
-        />
-      </div>
+      <Grid container spacing={4}>
+        {/* Calendario */}
+        <Grid item xs={12} md={8}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <Calendar
+              localizer={localizer}
+              events={filteredEvents}
+              startAccessor={(event) => new Date(event.event_start_datetime)}
+              endAccessor={(event) => new Date(event.event_end_datetime)}
+              style={{ height: 500 }}
+              messages={messages}
+              onSelectSlot={handleSelectSlot}
+              selectable
+              onSelectEvent={handleEventClick}
+              components={{
+                event: CustomEvent,
+              }}
+              views={["month", "week", "day", "agenda"]}
+              date={currentDate}
+              onNavigate={(date) => setCurrentDate(date)}
+            />
+          </Paper>
+        </Grid>
 
-      {/* Lista de próximos eventos */}
-      <div className="container-bottom">
-        <div className="container-events">
-          <List>
-            {upcomingEvents.length > 0 ? (
-              upcomingEvents.map((event, index) => (
-                <ListItem key={index}>
-                  <ListItemText
-                    primary={`${event.name} - ${moment(
-                      event.event_start_datetime
-                    ).format("LLL")}`}
-                    secondary={`Tipo: ${
-                      getEventTypeName(event.event_type) || "Desconocido"
-                    }`}
-                  />
+        {/* Lista de próximos eventos */}
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} sx={{ p: 2, height: "100%" }}>
+            <Typography variant="h6" gutterBottom align="center">
+              Próximos Eventos
+            </Typography>
+            <List>
+              {upcomingEvents.length > 0 ? (
+                upcomingEvents.map((event, index) => (
+                  <ListItem key={index} divider>
+                    <ListItemText
+                      primary={`${event.name}`}
+                      secondary={`${moment(event.event_start_datetime).format(
+                        "LLL"
+                      )} - Tipo: ${
+                        getEventTypeName(event.event_type) || "Desconocido"
+                      }`}
+                    />
+                  </ListItem>
+                ))
+              ) : (
+                <ListItem>
+                  <ListItemText primary="No hay próximos eventos" />
                 </ListItem>
-              ))
-            ) : (
-              <ListItem>
-                <ListItemText primary="No hay próximos eventos" />
-              </ListItem>
-            )}
-          </List>
-        </div>
-      </div>
+              )}
+            </List>
+          </Paper>
+        </Grid>
+      </Grid>
 
       {/* Popup de detalles del evento */}
       {showPopup && selectedEvent && (
-        <div className="event-popup">
-          <div className="popup-content">
+        <Dialog
+          open={showPopup}
+          onClose={handleClosePopup}
+          fullWidth
+          maxWidth="sm"
+        >
+          <DialogTitle>
+            {selectedEvent.name}
             <IconButton
               aria-label="close"
               onClick={handleClosePopup}
-              style={{ position: "absolute", right: "-15px", top: "-20px" }}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
             >
               <CloseIcon />
             </IconButton>
-
-            {/* Botón de eliminar */}
-            <IconButton
-              aria-label="delete"
-              onClick={handleDeleteEvent}
-              className="delete-btn"
-              style={{ position: "absolute", right: "33px", top: "-20px" }}
-            >
-              <DeleteIcon />
-            </IconButton>
-
-            {/* Botón de editar */}
+          </DialogTitle>
+          <DialogContent dividers>
+            <Typography gutterBottom>
+              <strong>Tipo de Evento:</strong> {selectedEvent.event_type_name}
+            </Typography>
+            <Typography gutterBottom>
+              <strong>Inicio:</strong>{" "}
+              {moment(selectedEvent.event_start_datetime).format("LLLL")}
+            </Typography>
+            <Typography gutterBottom>
+              <strong>Fin:</strong>{" "}
+              {moment(selectedEvent.event_end_datetime).format("LLLL")}
+            </Typography>
+            <Typography gutterBottom>
+              <strong>Localización:</strong> {selectedEvent.location}
+            </Typography>
+            <Typography gutterBottom>
+              <strong>Descripción:</strong> {selectedEvent.description}
+            </Typography>
+          </DialogContent>
+          <DialogActions>
             <IconButton
               aria-label="edit"
               onClick={handleEditEvent}
-              className="edit-btn"
-              style={{ position: "absolute", right: "80px", top: "-20px" }}
+              color="primary"
             >
               <EditIcon />
             </IconButton>
-
-            <h3>{selectedEvent.name}</h3>
-            <p>
-              <strong>Tipo de Evento:</strong> {selectedEvent.event_type_name}
-            </p>
-            <p>
-              <strong>Inicio:</strong>{" "}
-              {moment(selectedEvent.event_start_datetime).format("LLLL")}
-            </p>
-            <p>
-              <strong>Fin:</strong>{" "}
-              {moment(selectedEvent.event_end_datetime).format("LLLL")}
-            </p>
-            <p>
-              <strong>Localización:</strong> {selectedEvent.location}
-            </p>
-            <p>
-              <strong>Descripción:</strong> {selectedEvent.description}
-            </p>
-          </div>
-        </div>
+            <IconButton
+              aria-label="delete"
+              onClick={handleDeleteEvent}
+              color="error"
+            >
+              <DeleteIcon />
+            </IconButton>
+          </DialogActions>
+        </Dialog>
       )}
 
       {/* Dialog para crear un nuevo evento */}
@@ -519,100 +555,103 @@ const RegisterEvent = () => {
           <IconButton
             aria-label="close"
             onClick={handleCloseCreateDialog}
-            style={{ position: "absolute", right: "10px", top: "10px" }}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
           >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="dense"
-            label="Título del Evento"
-            name="title"
-            fullWidth
-            value={newEvent.title}
-            onChange={handleInputChange}
-            required
-          />
-          <FormControl fullWidth margin="dense" required>
-            <InputLabel id="type-label">Tipo de Evento</InputLabel>
-            <Select
-              labelId="type-label"
-              name="type"
-              value={newEvent.type}
+        <DialogContent dividers>
+          <Box
+            component="form"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              mt: 1,
+            }}
+          >
+            <TextField
+              label="Título del Evento"
+              name="title"
+              value={newEvent.title}
               onChange={handleInputChange}
-              label="Tipo de Evento"
-            >
-              <MenuItem value={1}>Académico</MenuItem>
-              <MenuItem value={2}>Artístico</MenuItem>
-              <MenuItem value={3}>Deportivo</MenuItem>
-              <MenuItem value={4}>Otro</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            margin="dense"
-            label="Hora de Inicio"
-            name="start"
-            type="datetime-local"
-            fullWidth
-            value={
-              newEvent.start
-                ? moment(newEvent.start).format("YYYY-MM-DDTHH:mm")
-                : ""
-            }
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, start: new Date(e.target.value) })
-            }
-            InputLabelProps={{
-              shrink: true,
-            }}
-            required
-          />
-          <TextField
-            margin="dense"
-            label="Hora de Finalización"
-            name="end"
-            type="datetime-local"
-            fullWidth
-            value={
-              newEvent.end
-                ? moment(newEvent.end).format("YYYY-MM-DDTHH:mm")
-                : ""
-            }
-            onChange={(e) =>
-              setNewEvent({ ...newEvent, end: new Date(e.target.value) })
-            }
-            InputLabelProps={{
-              shrink: true,
-            }}
-            required
-          />
-          <TextField
-            margin="dense"
-            label="Localización"
-            name="location"
-            fullWidth
-            value={newEvent.location}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            label="Breve Descripción"
-            name="briefDescription"
-            fullWidth
-            value={newEvent.briefDescription}
-            onChange={handleInputChange}
-          />
-          <TextField
-            margin="dense"
-            label="Descripción"
-            name="description"
-            fullWidth
-            multiline
-            rows={4}
-            value={newEvent.description}
-            onChange={handleInputChange}
-          />
+              required
+            />
+            <FormControl required>
+              <InputLabel id="type-label">Tipo de Evento</InputLabel>
+              <Select
+                labelId="type-label"
+                name="type"
+                value={newEvent.type}
+                onChange={handleInputChange}
+                label="Tipo de Evento"
+              >
+                <MenuItem value={1}>Académico</MenuItem>
+                <MenuItem value={2}>Artístico</MenuItem>
+                <MenuItem value={3}>Deportivo</MenuItem>
+                <MenuItem value={4}>Otro</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="Hora de Inicio"
+              name="start"
+              type="datetime-local"
+              value={
+                newEvent.start
+                  ? moment(newEvent.start).format("YYYY-MM-DDTHH:mm")
+                  : ""
+              }
+              onChange={(e) =>
+                setNewEvent({ ...newEvent, start: new Date(e.target.value) })
+              }
+              InputLabelProps={{
+                shrink: true,
+              }}
+              required
+            />
+            <TextField
+              label="Hora de Finalización"
+              name="end"
+              type="datetime-local"
+              value={
+                newEvent.end
+                  ? moment(newEvent.end).format("YYYY-MM-DDTHH:mm")
+                  : ""
+              }
+              onChange={(e) =>
+                setNewEvent({ ...newEvent, end: new Date(e.target.value) })
+              }
+              InputLabelProps={{
+                shrink: true,
+              }}
+              required
+            />
+            <TextField
+              label="Localización"
+              name="location"
+              value={newEvent.location}
+              onChange={handleInputChange}
+            />
+            <TextField
+              label="Breve Descripción"
+              name="briefDescription"
+              value={newEvent.briefDescription}
+              onChange={handleInputChange}
+            />
+            <TextField
+              label="Descripción"
+              name="description"
+              multiline
+              rows={4}
+              value={newEvent.description}
+              onChange={handleInputChange}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseCreateDialog} color="secondary">
@@ -637,103 +676,109 @@ const RegisterEvent = () => {
             <IconButton
               aria-label="close"
               onClick={() => setShowEditDialog(false)}
-              style={{ position: "absolute", right: "10px", top: "10px" }}
+              sx={{
+                position: "absolute",
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
             >
               <CloseIcon />
             </IconButton>
           </DialogTitle>
-          <DialogContent>
-            <TextField
-              margin="dense"
-              label="Título del Evento"
-              name="title"
-              fullWidth
-              value={editEvent.title}
-              onChange={handleEditInputChange}
-              required
-            />
-            <FormControl fullWidth margin="dense" required>
-              <InputLabel id="type-label">Tipo de Evento</InputLabel>
-              <Select
-                labelId="type-label"
-                name="type"
-                value={editEvent.type}
+          <DialogContent dividers>
+            <Box
+              component="form"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                mt: 1,
+              }}
+            >
+              <TextField
+                label="Título del Evento"
+                name="title"
+                value={editEvent.title}
                 onChange={handleEditInputChange}
-                label="Tipo de Evento"
-              >
-                <MenuItem value={1}>Académico</MenuItem>
-                <MenuItem value={2}>Artístico</MenuItem>
-                <MenuItem value={3}>Deportivo</MenuItem>
-                <MenuItem value={4}>Otro</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              margin="dense"
-              label="Hora de Inicio"
-              name="start"
-              type="datetime-local"
-              fullWidth
-              value={
-                editEvent.start
-                  ? moment(editEvent.start).format("YYYY-MM-DDTHH:mm")
-                  : ""
-              }
-              onChange={(e) =>
-                setEditEvent({ ...editEvent, start: new Date(e.target.value) })
-              }
-              InputLabelProps={{
-                shrink: true,
-              }}
-              required
-            />
-            <TextField
-              margin="dense"
-              label="Hora de Finalización"
-              name="end"
-              type="datetime-local"
-              fullWidth
-              value={
-                editEvent.end
-                  ? moment(editEvent.end).format("YYYY-MM-DDTHH:mm")
-                  : ""
-              }
-              onChange={(e) =>
-                setEditEvent({ ...editEvent, end: new Date(e.target.value) })
-              }
-              InputLabelProps={{
-                shrink: true,
-              }}
-              required
-            />
-            <TextField
-              margin="dense"
-              label="Localización"
-              name="location"
-              fullWidth
-              value={editEvent.location}
-              onChange={handleEditInputChange}
-            />
-            <TextField
-              margin="dense"
-              label="Breve Descripción"
-              name="briefDescription"
-              fullWidth
-              value={editEvent.briefDescription}
-              onChange={handleEditInputChange}
-            />
-            <TextField
-              margin="dense"
-              label="Descripción"
-              name="description"
-              fullWidth
-              multiline
-              rows={4}
-              value={editEvent.description}
-              onChange={handleEditInputChange}
-            />
+                required
+              />
+              <FormControl required>
+                <InputLabel id="edit-type-label">Tipo de Evento</InputLabel>
+                <Select
+                  labelId="edit-type-label"
+                  name="type"
+                  value={editEvent.type}
+                  onChange={handleEditInputChange}
+                  label="Tipo de Evento"
+                >
+                  <MenuItem value={1}>Académico</MenuItem>
+                  <MenuItem value={2}>Artístico</MenuItem>
+                  <MenuItem value={3}>Deportivo</MenuItem>
+                  <MenuItem value={4}>Otro</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                label="Hora de Inicio"
+                name="start"
+                type="datetime-local"
+                value={
+                  editEvent.start
+                    ? moment(editEvent.start).format("YYYY-MM-DDTHH:mm")
+                    : ""
+                }
+                onChange={(e) =>
+                  setEditEvent({ ...editEvent, start: new Date(e.target.value) })
+                }
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                required
+              />
+              <TextField
+                label="Hora de Finalización"
+                name="end"
+                type="datetime-local"
+                value={
+                  editEvent.end
+                    ? moment(editEvent.end).format("YYYY-MM-DDTHH:mm")
+                    : ""
+                }
+                onChange={(e) =>
+                  setEditEvent({ ...editEvent, end: new Date(e.target.value) })
+                }
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                required
+              />
+              <TextField
+                label="Localización"
+                name="location"
+                value={editEvent.location}
+                onChange={handleEditInputChange}
+              />
+              <TextField
+                label="Breve Descripción"
+                name="briefDescription"
+                value={editEvent.briefDescription}
+                onChange={handleEditInputChange}
+              />
+              <TextField
+                label="Descripción"
+                name="description"
+                multiline
+                rows={4}
+                value={editEvent.description}
+                onChange={handleEditInputChange}
+              />
+            </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setShowEditDialog(false)} color="secondary">
+            <Button
+              onClick={() => setShowEditDialog(false)}
+              color="secondary"
+            >
               Cancelar
             </Button>
             <Button onClick={handleUpdateEvent} color="primary">
@@ -742,16 +787,29 @@ const RegisterEvent = () => {
           </DialogActions>
         </Dialog>
       )}
-    </div>
+    </Box>
   );
 };
 
 // Componente personalizado para los eventos
 const CustomEvent = ({ event }) => (
-  <div className="custom-event">
-    {event.name}
-    <span className="event-type"> ({getEventTypeName(event.event_type)})</span>
-  </div>
+  <Box
+    sx={{
+      backgroundColor: "#1976d2",
+      color: "#fff",
+      padding: "2px 5px",
+      borderRadius: "4px",
+      textAlign: "center",
+      cursor: "pointer",
+    }}
+  >
+    <Typography variant="body2" noWrap>
+      {event.name}
+    </Typography>
+    <Typography variant="caption">
+      ({getEventTypeName(event.event_type)})
+    </Typography>
+  </Box>
 );
 
 export default RegisterEvent;

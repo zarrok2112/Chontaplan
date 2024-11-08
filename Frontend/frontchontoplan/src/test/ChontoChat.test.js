@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent,waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import ChatGPTClone from '../components/components-chatbot/ChontoChat';
@@ -73,9 +73,7 @@ describe('ChatGPTClone', () => {
       </Provider>
     );
 
-    const errorMessage = await waitFor(() =>
-        screen.getByText('No se encontró el token de acceso. Por favor, inicia sesión primero.')
-        );
+    const errorMessage = await screen.findByText('No se encontró el token de acceso. Por favor, inicia sesión primero.');
     
         expect(errorMessage).toBeInTheDocument();
   });
