@@ -90,6 +90,26 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         return response
     
+class UserInfoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_email = request.user.email  # Suponiendo que el email se pasa como parámetro en la URL
+        
+        if not user_email:
+            return Response({"error": "Email no proporcionado."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = get_user_model().objects.get(email=user_email)
+            user_data = {
+                "email": user.email,
+                "name": user.name,
+                "role": user.role
+            }
+            return Response(user_data, status=status.HTTP_200_OK)
+        except get_user_model().DoesNotExist:
+            return Response({"error": "Usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
 class ActivateAccountView(APIView):
     permission_classes = [AllowAny]
 
