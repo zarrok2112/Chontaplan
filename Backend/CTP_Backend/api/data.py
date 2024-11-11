@@ -7,3 +7,13 @@ USER_ROLE_CHOICES = (
     (ROLE_EVENT_ORGANIZATION,'Organizador de Eventos'),
     (ROLE_TOURIST,'Turista')
 )
+
+# Event Suscriptions
+STATUS_VALID = 0
+STATUS_INVALID = 1
+STATUS_PENDING = 2
+STATUS_CHOICES = (
+    (STATUS_VALID,'Valido'),
+    (STATUS_INVALID,'Invalido'),
+    (STATUS_PENDING,'Pendiente')
+)

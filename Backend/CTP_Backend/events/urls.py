@@ -9,4 +9,5 @@ from . import views
 urlpatterns = [
     path('', views.EventView.as_view(), name='event-list'),
     path('<int:pk>/', views.EventView.as_view(), name='event-detail'),
+    path('suscribirse/', views.suscribirse, name='suscribirse'),
 ]

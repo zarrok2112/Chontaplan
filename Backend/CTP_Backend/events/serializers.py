@@ -6,7 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 from .models import(
     Event,
-    EventType
+    EventType,
+    EventSuscriptions
 )
 
 
@@ -21,3 +22,8 @@ class EventSerializer(serializers.ModelSerializer):
             'location', 'brief_description', 'created_at', 
             'event_start_datetime', 'event_end_datetime', 'status'
         ]
+
+class SuscripcionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventSuscriptions
+        fields = ['evento_id']
