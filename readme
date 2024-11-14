@@ -1,1 +1,61 @@
-hola
+
+Cali Tourist
+Descripción: Cali Tourist es una plataforma web diseñada para la promoción y gestión de eventos en la ciudad de Cali, Colombia. Su propósito es permitir a los usuarios descubrir eventos de diversos sectores, como académico, artístico y deportivo, mientras facilita a los organizadores la creación y administración de sus eventos. La plataforma cuenta con un sistema de recomendación basado en inteligencia artificial que, a través de un chatbot interactivo, sugiere eventos personalizados según la fecha, descripción y etiquetas.
+
+Roles
+Product Owner (PO): Camilo Velasquez - 2191013
+QA: Kenny Diaz - 2195114
+Desarrolladores (Dev):
+Andres Muñoz - 2201601
+Sebastian Valverde - 2191261
+Mateo Hanaoka - 2205508
+
+
+
+Requerimientos Funcionales
+Registro y Autenticación
+Los organizadores deben registrarse utilizando un correo institucional para poder crear y gestionar eventos (se restringen correos no institucionales, como Gmail).
+Los usuarios pueden registrarse para recibir recomendaciones personalizadas y guardar eventos de su interés.
+Creación y Gestión de Eventos
+Los organizadores podrán crear, editar y eliminar eventos, clasificándolos en categorías como académico, artístico o deportivo.
+Cada evento incluirá detalles como fecha, hora, ubicación, descripción, etiquetas y organización asociada.
+Cada edición en un evento será registrada y mostrada con una justificación para los usuarios.
+Visualización de Eventos
+Los usuarios pueden navegar por los eventos y filtrarlos por categoría, fecha y etiquetas.
+Cada evento tendrá una página detallada con toda la información relevante.
+Recomendaciones Personalizadas a través del Chat
+La plataforma incluye un chatbot interactivo que sugiere eventos según las preferencias del usuario, utilizando datos de fecha, descripción y etiquetas de los eventos.
+Interfaz de Usuario
+Diseño adaptativo y responsivo, accesible desde dispositivos móviles y de escritorio.
+Navegación fácil y rápida, con filtros claros y categorización visible.
+Requerimientos No Funcionales
+Rendimiento
+Respuesta rápida tanto en la carga de la página como en la interacción con el bot, para una experiencia de usuario fluida.
+Escalabilidad
+La plataforma debe soportar un número creciente de usuarios y eventos sin comprometer el rendimiento.
+Seguridad
+Autenticación segura y protección de datos personales y de eventos mediante cifrado y prácticas recomendadas.
+Disponibilidad
+Disponibilidad mínima del 95% anual, con un enfoque en el horario de 5:00 a 00:00.
+Compatibilidad y Mantenibilidad
+Compatible con navegadores Chrome, Firefox, Opera, Safari y Edge.
+Documentación de API con herramientas como Redoc y Swagger.
+Diseño responsivo, compatible con dispositivos móviles y tabletas.
+Características Especiales
+Catálogo de Eventos Clasificados
+Los eventos están organizados en categorías como académicos, artísticos y deportivos.
+Los usuarios pueden explorar eventos filtrando por fecha, categoría y etiquetas.
+Creación y Gestión de Eventos
+Los organizadores pueden añadir, editar y eliminar eventos con detalles como fecha, hora, ubicación y descripción.
+Cada cambio realizado se registra y se muestra al usuario con una justificación.
+Sistema de Registro y Autenticación
+Los organizadores utilizan un correo institucional para registrarse y gestionar eventos.
+Recomendaciones Personalizadas
+Chat interactivo que sugiere eventos según las preferencias del usuario.
+El bot analiza la fecha, descripción y etiquetas de los eventos para ofrecer recomendaciones precisas.
+Interfaz de Usuario Intuitiva
+Diseño adaptativo y responsivo para una experiencia óptima en dispositivos móviles y de escritorio.
+Navegación clara con filtros visibles y categorización organizada.
+Administración de Eventos
+Panel de administración para que los organizadores puedan añadir, editar y eliminar eventos.
+
