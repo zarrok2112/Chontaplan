@@ -100,6 +100,8 @@ const Login = () => {
       if (response.status === 200) {
         dispatch(getToken({ value: response.data.access }));
         dispatch(showAlert({ type: 'success', message: 'Se logueó exitosamente!' }));
+       const rol_user = await  services.getInfoUser(response.data.access);
+       dispatch(isActive({ isActive: true, infoUser: rol_user.data }));
         navigate('/home');
       } else {
         dispatch(showAlert({ type: 'error', message: 'Error al loguearse' }));
@@ -220,8 +222,7 @@ const Login = () => {
     if (email === '') {
       setErrorValidateEmail(true);
     } else {
-      const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]*\.edu(\.[a-zA-Z]{2})?$/;
-      setErrorValidateEmail(regex.test(email));
+   
     }
   };
 
