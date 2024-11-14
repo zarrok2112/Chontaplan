@@ -11,6 +11,7 @@ import { showAlert } from '../../store/reducerAlert/alertSlice';
 import { getToken } from '../../store/reducerToken/tokenSlice';
 import { isActive } from '../../store/reducerSession/sessionSlice';
 
+
 const domain = 'dev-e44aobm0ldptdogh.us.auth0.com';
 const clientId = 'KKSqRhDusjQzbXWAECdoHtBnDr4VTlKs';
 const GOOGLE_CLIENT_ID = 'ANDRESAQUIVATUID.apps.googleusercontent.com';
@@ -98,6 +99,10 @@ const Login = () => {
         console.log("se logio exitosamente");
         dispatch(getToken({ value: response.data.access }));
         dispatch(showAlert({ type: 'success', message: 'Se logio exitosamente!' }));
+        /* services.getInfoUser(response.data.access).then(resp => {
+          debugger;
+          dispatch(isActive({ isActive: true, infoUser: resp }));
+        }); */
         navigate('/home');
       } else {
         console.log("error else");
@@ -118,6 +123,8 @@ const Login = () => {
     const correo = e.target.email.value;
     const contra = e.target.pass.value;
     const confirmarContra = e.target.passTwo.value;
+    const checkTourist = e.target.checkTourist.value === 'on' ? 1 : 0;
+    debugger;
 
     if (!errorValidateEmail) {
       setMessageError("Por favor, use un correo electrónico educativo válido.");
@@ -139,7 +146,7 @@ const Login = () => {
         "name": nombre,
         "email": correo,
         "password": contra,
-        "role": 0
+        "role": checkTourist
       }
     }
 
@@ -250,7 +257,7 @@ const Login = () => {
 
             <div className="signup">
               <form onSubmit={registrarUsuario}>
-                <label htmlFor="chk" aria-hidden="true">Registro</label>
+                <label class="cls-registro" htmlFor="chk" aria-hidden="true">Registro</label>
                 <input
                   type="text"
                   name="txt"
@@ -305,7 +312,16 @@ const Login = () => {
                     validatePass(isValidatePassword,e.target.value);
                   }}
                 />
+
                 {messageError && <p style={{color:'white'}}>{messageError}</p>}
+                <span>Eres turista?</span>
+                <label class="switch">
+                  <input type="checkbox" 
+                         name="checkTourist" 
+                         id="checkTourist"
+                  />
+                  <span class="slider round"></span>
+                </label>
                 <button className="btn-registry" type="submit" id="joinus">Registrar</button>
               </form>
             </div>

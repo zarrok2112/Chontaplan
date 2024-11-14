@@ -80,6 +80,14 @@ class Services {
       }
     );
   }
+
+  getInfoUser(token) {
+    return axios.get("http://localhost:8000/api/v1/user/user-info/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
 }
 
 export default new Services();
