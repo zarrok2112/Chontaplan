@@ -12,6 +12,7 @@
     "@reduxjs/toolkit": "^2.2.7",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.7.4",
+    "frontchontoplan": "file:",
     "gapi-script": "^1.2.0",
     "jwt-decode": "^4.0.0",
     "moment": "^2.30.1",
@@ -62,7 +63,10 @@
     },
     "transformIgnorePatterns": [
       "/node_modules/(?!(axios)/)"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^@auth0/auth0-react$": "<rootDir>/src/__mocks__/@auth0/auth0-react.js"
+    }
   },
   "presets": [
     "@babel/preset-env",

@@ -3,3 +3,5 @@ Frontend/frontchontoplan/node_modules/.cache/default-development/index.pack.old
 Frontend/frontchontoplan/node_modules/.bin/acorn
 
 Backend/.env
+Frontend/frontchontoplan/package-lock.json
+Frontend/frontchontoplan/package.json

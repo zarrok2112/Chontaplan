@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.utils.text import slugify
 
 from api.models import User
+from api.data import STATUS_CHOICES
 
 # Create your models here.
 
@@ -52,3 +53,9 @@ class Event(models.Model):
                 'status': old_instance.status,
             }
         super().save(*args, **kwargs)
+
+class EventSuscriptions(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='event_subscriptions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='event_subscriptions')
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)

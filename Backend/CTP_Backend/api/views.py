@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-
+from .data import USER_ROLE_CHOICES
 from .models import User
 from .serializers import (
     UserSerializer,
@@ -90,6 +90,26 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         return response
     
+class UserInfoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_email = request.user.email  # Suponiendo que el email se pasa como parámetro en la URL
+        
+        if not user_email:
+            return Response({"error": "Email no proporcionado."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = get_user_model().objects.get(email=user_email)
+            user_data = {
+                "email": user.email,
+                "name": user.name,
+                "role": user.role
+            }
+            return Response(user_data, status=status.HTTP_200_OK)
+        except get_user_model().DoesNotExist:
+            return Response({"error": "Usuario no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
 class ActivateAccountView(APIView):
     permission_classes = [AllowAny]
 
@@ -109,3 +129,9 @@ class ActivateAccountView(APIView):
         else:
             return Response({'message': 'Token inválido o expirado.'}, status=status.HTTP_400_BAD_REQUEST)
 
+class UserRoleChoicesView(APIView):
+    def get(self, request, *args, **kwargs):
+        roles_dict = {name: idx  for idx, (code, name) in enumerate(USER_ROLE_CHOICES)}
+
+        filtered_data = {k: v for k, v in roles_dict.items() if v != 0}
+        return Response(filtered_data, status=status.HTTP_200_OK)

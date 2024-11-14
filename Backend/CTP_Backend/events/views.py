@@ -14,8 +14,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
-from .serializers import EventSerializer
-from .models import Event
+from .serializers import EventSerializer, SuscripcionSerializer
+from .models import Event, EventSuscriptions
 
 class EventView(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
@@ -60,3 +60,22 @@ class EventView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Event.DoesNotExist:
             return Response({"error": "Evento no encontrado."}, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def suscribirse(request):
+    # Obtener el usuario logueado
+    usuario = request.user
+    serializer = SuscripcionSerializer(data=request.data)
+    
+    if serializer.is_valid():
+        # Crear la suscripción con el usuario logueado
+        suscripcion = EventSuscriptions(
+            event=serializer.validated_data['evento_id'],
+            user=usuario,
+            status=0
+        )
+        suscripcion.save()
+        return Response({"message": "La suscripción ha sido un éxito"}, status=status.HTTP_201_CREATED)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

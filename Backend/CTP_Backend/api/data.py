@@ -1,6 +1,19 @@
-ROLE_EVENT_ORGANIZATION = 0
-ROLE_TOURIST = 1
+ROLE_EVENT_ADMIN = 0
+ROLE_EVENT_ORGANIZATION = 1
+ROLE_TOURIST = 2
+
 USER_ROLE_CHOICES = (
-    (ROLE_EVENT_ORGANIZATION,' event_organization'),
-    (ROLE_TOURIST,'tourist')
+    (ROLE_EVENT_ADMIN,'Administrador'),
+    (ROLE_EVENT_ORGANIZATION,'Organizador de Eventos'),
+    (ROLE_TOURIST,'Turista')
+)
+
+# Event Suscriptions
+STATUS_VALID = 0
+STATUS_INVALID = 1
+STATUS_PENDING = 2
+STATUS_CHOICES = (
+    (STATUS_VALID,'Valido'),
+    (STATUS_INVALID,'Invalido'),
+    (STATUS_PENDING,'Pendiente')
 )
