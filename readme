@@ -50,7 +50,6 @@ Los organizadores pueden añadir, editar y eliminar eventos con detalles como fe
 Cada cambio realizado se registra y se muestra al usuario con una justificación.
 Sistema de Registro y Autenticación
 Los organizadores utilizan un correo institucional para registrarse y gestionar eventos.
-Los usuarios pueden registrarse para recibir recomendaciones personalizadas y guardar eventos de su interés.
 Recomendaciones Personalizadas
 Chat interactivo que sugiere eventos según las preferencias del usuario.
 El bot analiza la fecha, descripción y etiquetas de los eventos para ofrecer recomendaciones precisas.
@@ -59,4 +58,4 @@ Diseño adaptativo y responsivo para una experiencia óptima en dispositivos mó
 Navegación clara con filtros visibles y categorización organizada.
 Administración de Eventos
 Panel de administración para que los organizadores puedan añadir, editar y eliminar eventos.
-Gestión de la información y seguimiento de cambios realizados, asegurando que cada edición esté justificada.
+
