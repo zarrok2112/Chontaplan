@@ -1,6 +1,4 @@
-// src/components/component-register-event/RegisterEvent.jsx
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useInsertionEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -47,6 +45,7 @@ const getEventTypeName = (eventType) => {
 };
 
 const RegisterEvent = () => {
+  const myData = useSelector((state) => state.session);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -419,13 +418,14 @@ const RegisterEvent = () => {
         className="event-creation-section"
         sx={{ display: "flex", justifyContent: "center", mb: 4 }}
       >
-        <Button
+      {myData.infoUser.role === 0 ? (<Button
           variant="contained"
           color="primary"
           onClick={handleCreateButtonClick}
         >
           Crear nuevo evento
-        </Button>
+        </Button>): (<>ERES TURISTA </>) }  
+        
       </Box>
 
       <Grid container spacing={4}>
