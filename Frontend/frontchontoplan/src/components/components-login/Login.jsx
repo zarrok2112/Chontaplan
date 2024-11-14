@@ -119,7 +119,8 @@ const Login = () => {
     const correo = e.target.elements['email'].value;
     const contra = e.target.elements['pass'].value;
     const confirmarContra = e.target.elements['passTwo'].value;
-
+    const checkTourist = e.target.elements['checkTourist'].value  === '1' ? 1 : 0;
+    
     if (!errorValidateEmail) {
       setMessageError("Por favor, use un correo electrónico educativo válido.");
       return;
@@ -304,13 +305,10 @@ const Login = () => {
 
                 {messageError && <p style={{ color: 'white' }}>{messageError}</p>}
                 <span>Eres turista?</span>
-                <label class="switch">
-                  <input type="checkbox" 
-                         name="checkTourist" 
-                         id="checkTourist"
-                  />
-                  <span class="slider round"></span>
-                </label>
+                <select name='checkTourist'>
+                  <option value="0">No</option>
+                  <option value="1">Si</option>
+                </select>
                 <button className="btn-registry" type="submit" id="joinus">Registrar</button>
               </form>
             </div>
