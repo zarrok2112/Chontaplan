@@ -321,13 +321,13 @@ const Login = () => {
                 <input type="password" name="pswd" id="pass" placeholder="Password (Inicio de sesión)" required />
                 <button className="btn-login" type="submit" id="disparo">Iniciar</button>
               </form>
-              <div className='btn-google'>
+              {/* <div className='btn-google'>
                 <GoogleLogin
                   onSuccess={onSuccess}
                   onError={onFailure}
                 />
                 <LoginButton />
-              </div>
+              </div> */}
             </div>
             <LogoutButton />
             <Profile />
