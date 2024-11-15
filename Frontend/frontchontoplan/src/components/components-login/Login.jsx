@@ -15,13 +15,6 @@ const domain = 'dev-e44aobm0ldptdogh.us.auth0.com';
 const clientId = 'KKSqRhDusjQzbXWAECdoHtBnDr4VTlKs';
 const GOOGLE_CLIENT_ID = 'ANDRESAQUIVATUID.apps.googleusercontent.com';
 
-const LoginButton = () => {
-  return <button onClick={() => loginWithRedirect()} className="btn-login">Log In with Auth0</button>;
-};
-
-const LogoutButton = () => {
-  return <button onClick={() => logout({ returnTo: window.location.origin })} className="btn-login">Log Out</button>;
-};
 
 const Login = () => {
   const navigate = useNavigate();
@@ -275,15 +268,7 @@ const Login = () => {
                 <input type="password" name="pswd" id="pass" placeholder="Password (Inicio de sesión)" required />
                 <button className="btn-login" type="submit" id="disparo">Iniciar</button>
               </form>
-              {/* <div className='btn-google'>
-                <GoogleLogin
-                  onSuccess={onSuccess}
-                  onError={onFailure}
-                />
-                <LoginButton />
-              </div> */}
             </div>
-            <LogoutButton />
           </div>
         </div>
       </GoogleOAuthProvider>
