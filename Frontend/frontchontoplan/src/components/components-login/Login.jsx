@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import './login.css';
@@ -17,47 +16,16 @@ const clientId = 'KKSqRhDusjQzbXWAECdoHtBnDr4VTlKs';
 const GOOGLE_CLIENT_ID = 'ANDRESAQUIVATUID.apps.googleusercontent.com';
 
 const LoginButton = () => {
-  const { loginWithRedirect } = useAuth0();
   return <button onClick={() => loginWithRedirect()} className="btn-login">Log In with Auth0</button>;
 };
 
 const LogoutButton = () => {
-  const { logout } = useAuth0();
   return <button onClick={() => logout({ returnTo: window.location.origin })} className="btn-login">Log Out</button>;
-};
-
-const Profile = () => {
-  const { user, isAuthenticated, isLoading } = useAuth0();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      dispatch(isActive({ isActive: true, infoUser: user }));
-      dispatch(showAlert({ type: 'success', message: 'Logged in successfully!' }));
-      navigate('/home');
-    }
-  }, [isAuthenticated, user, dispatch, navigate]);
-
-  if (isLoading) {
-    return <Progress />;
-  }
-
-  return (
-    isAuthenticated && (
-      <div>
-        <img src={user.picture} alt={user.name} />
-        <h2>{user.name}</h2>
-        <p>{user.email}</p>
-      </div>
-    )
-  );
 };
 
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isAuthenticated, user } = useAuth0();
 
   const [isValidatePassword, setValidatePassword] = useState('');
   const [isConfirmPassword, setIsConfirmPassword] = useState('');
@@ -66,13 +34,6 @@ const Login = () => {
   const [errorValidateEmail, setErrorValidateEmail] = useState(true);
   const [progress, setProgress] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      dispatch(isActive({ isActive: true, infoUser: user }));
-      dispatch(showAlert({ type: 'success', message: 'Logged in successfully!' }));
-      navigate('/home');
-    }
-  }, [isAuthenticated, user, dispatch, navigate]);
 
   const onSuccess = (credentialResponse) => {
     const decoded = jwtDecode(credentialResponse.credential);
@@ -227,13 +188,6 @@ const Login = () => {
   };
 
   return (
-    <Auth0Provider
-      domain={domain}
-      clientId={clientId}
-      authorizationParams={{
-        redirect_uri: window.location.origin
-      }}
-    >
       <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
         <div className="component-login">
           {progress && <Progress />}
@@ -330,11 +284,9 @@ const Login = () => {
               </div> */}
             </div>
             <LogoutButton />
-            <Profile />
           </div>
         </div>
       </GoogleOAuthProvider>
-    </Auth0Provider>
   );
 };
 

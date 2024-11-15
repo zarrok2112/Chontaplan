@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useAuth0 } from "@auth0/auth0-react";
 import {Box,Drawer,AppBar,Toolbar,Typography,List,ListItem,ListItemButton,ListItemIcon,ListItemText,CssBaseline,Divider,} from "@mui/material";
 import EventIcon from "@mui/icons-material/Event";
 import ChatIcon from "@mui/icons-material/Chat";
@@ -7,11 +6,12 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import RegisterEvent from "../component-register-event/RegisterEvent";
 import ChatGPTClone from "../components-chatbot/ChontoChat";
 import Progress from "../component-progress/Progress";
+import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
 const Home = () => {
-  const { logout } = useAuth0();
+  const navigate = useNavigate();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [title, setTitle] = useState("Registrar mi evento");
   const [progress, setProgress] = useState(false);
@@ -30,6 +30,10 @@ const Home = () => {
         break;
     }
   };
+
+  const handleCerrarSession = () => {
+    navigate('/');
+  }
 
   const renderComponent = () => {
     switch (selectedIndex) {
@@ -109,7 +113,7 @@ const Home = () => {
             <ListItem disablePadding>
               <ListItemButton
                 onClick={() =>
-                  logout({ returnTo: window.location.origin })
+                  handleCerrarSession()
                 }
               >
                 <ListItemIcon sx={{ color: "#FFFFFF" }}>
